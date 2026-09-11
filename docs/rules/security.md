@@ -13,7 +13,7 @@
 
 | 类别 | 核心规则 |
 |------|----------|
-| **密码存储** | SM3 三次加盐哈希（应用层 Hutool），禁止 MD5/SHA1 |
+| **密码存储** | SM3 哈希（三次迭代 + 盐，应用层 Hutool），禁止 MD5/SHA1 |
 | **密码传输** | 登录密码 SM2 加密（应用层） |
 | **敏感数据存储** | 手机号、身份证、资产密钥 **数据库层 kbcrypto SM4 加密** |
 | **Token** | JWT + SM2 签名，httpOnly Cookie 存储 |
@@ -48,7 +48,7 @@
 
 | 场景 | 加密层次 | 算法 | 是否可逆 |
 |------|----------|------|----------|
-| **用户密码存储** | 应用层 | SM3 + 三次加盐 | ❌ 不可逆 |
+| **用户密码存储** | 应用层 | SM3 哈希（三次迭代 + 盐） | ❌ 不可逆 |
 | **登录密码传输** | 应用层 | SM2 | ✅ 可逆 |
 | **JWT 签名** | 应用层 | SM2 | ✅ 可验签 |
 | **手机号存储** | 数据库层 | kbcrypto SM4 | ✅ 可逆 |
@@ -66,13 +66,13 @@
 
 ---
 
-## 二、密码存储（SM3 加盐）
+## 二、密码存储（SM3 哈希）
 
-> **应用层**使用 Hutool 实现 SM3 三次加盐哈希。
+> **应用层**使用 Hutool 实现 SM3 哈希（三次迭代 + 盐）。
 
 ### 2.1 存储方案
 
-采用 **SM3 三次加盐哈希**：
+采用 **SM3 三次迭代哈希（固定盐）**：
 
 ```java
 public class PasswordEncoder {
@@ -82,7 +82,7 @@ public class PasswordEncoder {
     private static final String SALT_3 = "固定盐3";
     
     /**
-     * 三次加盐 SM3 哈希
+     * 三次迭代 SM3 哈希（固定盐）
      */
     public static String encode(String password) {
         String hash1 = SmUtil.sm3(password + SALT_1);
@@ -230,7 +230,7 @@ export const login = async (username: string, password: string) => {
 
 | 字段 | 加密方式 | 说明 |
 |------|----------|------|
-| **密码** | SM3 加盐（应用层） | 不可逆 |
+| **密码** | SM3 哈希（三次迭代 + 盐，应用层） | 不可逆 |
 | **手机号** | kbcrypto SM4（数据库层） | 可逆，需解密展示 |
 | **身份证** | kbcrypto SM4（数据库层） | 可逆，需解密展示 |
 | **资产密钥/许可证** | kbcrypto SM4（数据库层） | 可逆，需解密展示 |
@@ -516,7 +516,7 @@ application-local.yml
 
 提交代码前自检：
 
-- [ ] 密码使用 SM3 三次加盐
+- [ ] 密码使用 SM3 哈希（三次迭代 + 盐）
 - [ ] 登录密码前端用 SM2 加密传输
 - [ ] 手机号、身份证、资产密钥使用数据库层 kbcrypto SM4 加密
 - [ ] JWT 使用 SM2 签名
