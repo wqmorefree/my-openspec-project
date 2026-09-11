@@ -3,11 +3,13 @@ schema: spec-driven
 # Project context (optional)
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  系统技术资产登记管理（信创合规）。
+  后端：Java 17 + Spring Boot 3 + MyBatis-Plus + KingbaseES（人大金仓 V8R6，端口 54321），
+  数据敏感字段用数据库层 kbcrypto SM4 加密，密码 SM3 三次加盐。
+  前端：Vue 3 + TypeScript + Pinia + Vite。
+  规范：Conventional Commits；API 前缀 /api/v1；主键 UUID。
+  领域规则见 docs/rules/，功能规范见 openspec/specs/。
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.

@@ -152,10 +152,12 @@ feat(asset): 添加资产登记功能
 
 | 命令 | 用途 |
 |------|------|
-| `/opsx:propose` | 创建变更提案 + 规范文档 |
-| `/opsx:apply` | 按 `tasks.md` 实现代码 |
-| `/opsx:verify` | 验证实现是否符合规范 |
-| `/opsx:archive` | 归档并更新主规范库 |
+| `/opsx-propose` | 创建变更提案 + 规范文档 |
+| `/opsx-apply` | 按 `tasks.md` 实现代码 |
+| `/opsx-sync` | 将 delta 规范同步到主规范 |
+| `/opsx-archive` | 归档变更，必要时内联同步主规范 |
+| `/opsx-explore` | 探索模式：思考、调研、澄清需求 |
+| `/opsx-update` | 修订规划产物并保持一致性 |
 
 ---
 
