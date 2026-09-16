@@ -46,6 +46,28 @@
 
 ## 模块职责
 
+本 change 交付 3 个 Capability，先做「能力 → 工程模块」映射，再列各模块职责（能力定义见 `proposal.md Capabilities`，验收场景见 `specs/`）。
+
+| Capability(spec) | 能力内容（摘要） | 主要落点模块 | 本 change 交付 |
+|---|---|---|---|
+| `user-auth` | 登录认证、JWT 会话、角色权限（管理员/普通用户） | `ruoyi-system`(认证)、`ruoyi-common/security`(国密)、`plus-ui`(登录页) | 核心实现 |
+| `system-registration` | 系统资产登记：系统 CRUD、列表/导入/导出、编码唯一、SM4 敏感加密 | `ruoyi-system`(业务)、`ruoyi-common/security`(SM4)、`plus-ui`(列表/表单) | 核心实现 |
+| `asset-registry-shell` | 详情页 Tab 宿主：路由、12 Tab 容器、注册表机制 | `plus-ui`(详情页)、`ruoyi-system`(详情接口) | 核心实现 |
+
+然后按工程模块展开职责：
+
+### 能力 → 工程模块映射
+
+本 change 定义 3 个 Capability（详见 `proposal.md Capabilities` 与各自 `specs/*/spec.md`）：
+
+| Capability（spec 目录） | 职责概要 | 主要落点 |
+|---|---|---|
+| `user-auth` | 登录认证、国密（SM2/SM3/SM4）、JWT/Sa-Token 会话、角色权限（管理员/普通用户） | `ruoyi-system`（认证）、`ruoyi-common/security`（国密）、`plus-ui`（登录） |
+| `system-registration` | 系统资产登记：系统 CRUD、列表/搜索筛选、导入导出、编码唯一、SM4 敏感字段加密 | `ruoyi-system`（业务）、`ruoyi-common`（通用/加解密）、`plus-ui`（列表/表单） |
+| `asset-registry-shell` | 系统详情页 Tab 宿主：路由、12 Tab 容器、子表组件注册表（本 change 仅基础信息） | `plus-ui`（详情宿主）、`ruoyi-system`（详情接口） |
+
+**工程模块 → 职责**：
+
 | 模块 | 职责 | 本 change 交付 |
 |---|---|---|
 | `ruoyi-admin` | 应用启动、全局异常处理、CORS/过滤器、打包 | 参与但不改 |
