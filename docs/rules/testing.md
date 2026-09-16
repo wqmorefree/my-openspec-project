@@ -525,7 +525,9 @@ verify(userMapper, times(1)).selectById("uuid-123");
 verify(userMapper, never()).deleteById(anyString());
 ```
 
-### 7.2 Mock 国密工具
+### 7.2 敏感字段 SM4 测试（数据库层 kbcrypto）
+
+> 按 `database.md` 7.4，敏感字段加解密由 `Sm4TypeHandler` 编排、调用数据库层 kbcrypto 的 `sm4()` 函数，**不存在独立的 `Sm4Util` 类**。单元测试时 Mock，集成测试验证真实链路。
 
 **单元测试时 Mock**：
 
@@ -534,35 +536,47 @@ verify(userMapper, never()).deleteById(anyString());
 class UserServiceTest {
     
     @Mock
-    private Sm4Util sm4Util;
+    private Sm4TypeHandler sm4TypeHandler;
     
     @Test
     void should_encryptPhone_when_createUser() {
-        when(sm4Util.encrypt("13812341234")).thenReturn("encrypted-phone");
+        UserEntity user = new UserEntity();
+        user.setPhone("13812341234");
         
-        // 测试逻辑
-        verify(sm4Util).encrypt("13812341234");
+        // 测试逻辑：持久化后断言落库为密文
+        
+        verify(userMapper, never()).deleteById(anyString());
     }
 }
 ```
 
-**集成测试时使用真实工具**：
+**集成测试时验证完整加解密链路**：
 
 ```java
 @SpringBootTest
 class UserServiceIT {
     
     @Autowired
-    private Sm4Util sm4Util;  // 真实工具，验证加解密链路
+    private UserMapper userMapper;
     
     @Test
-    void should_encryptAndDecryptPhone() {
-        String phone = "13812341234";
-        String encrypted = sm4Util.encrypt(phone);
-        assertThat(sm4Util.decrypt(encrypted)).isEqualTo(phone);
+    void should_storeCipherAndReadPlain() {
+        UserEntity user = new UserEntity();
+        user.setPhone("13812341234");
+        userMapper.insert(user);
+        
+        // 数据库实际存的是 SM4 密文
+        UserEntity fromDb = userMapper.selectByPhoneRaw(user.getId());
+        assertThat(fromDb.getPhone()).isNotEqualTo("13812341234");
+        
+        // 经 Sm4TypeHandler 解密后应用层读到明文
+        UserEntity decrypted = userMapper.selectById(user.getId());
+        assertThat(decrypted.getPhone()).isEqualTo("13812341234");
     }
 }
 ```
+
+> `selectByPhoneRaw` 为绕过 TypeHandler 的查询（例如 XML 中直接映射字段），用于断言落库为密文。
 
 ### 7.3 前端 Mock
 

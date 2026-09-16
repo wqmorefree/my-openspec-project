@@ -19,7 +19,7 @@ context: |
 
   加密（国密）：SM2 登录传输加密 + JWT 签名；SM3 密码哈希（三次迭代 + 固定盐常量）；
   敏感字段（手机号、身份证、资产密钥、数据库用户名）SM4 加密存储。
-  国密库：Hutool + BouncyCastle。
+  国密库：Hutool + BouncyCastle（SM2/SM3）；SM4 走数据库层 kbcrypto 插件（database.md 7.4）。
 
   规范：Conventional Commits；API 前缀 /api/v1；主键 UUID（VARCHAR(64)）。
   领域规则见 docs/rules/，功能规范见 openspec/specs/。
