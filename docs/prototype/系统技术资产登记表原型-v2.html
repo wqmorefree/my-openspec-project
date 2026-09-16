@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统技术资产</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== 全局重置 & 变量 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --sidebar-width: 220px;
+            --header-height: 64px;
+            --primary: #2b5fd9;
+            --primary-light: #e8edfb;
+            --primary-dark: #1a3f8c;
+            --primary-gradient: linear-gradient(135deg, #2b5fd9 0%, #1a4cbf 100%);
+            --sidebar-bg: #0f1825;
+            --sidebar-hover: #1e2d44;
+            --bg-main: #f2f5fa;
+            --card-bg: #ffffff;
+            --border-color: #e6ecf3;
+            --text-main: #0f1825;
+            --text-secondary: #4a5b6e;
+            --text-light: #8a9bb0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.10);
+            --radius: 12px;
+            --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #eef0f4; }
+        ::-webkit-scrollbar-thumb { background: #c8d0dc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8b4c4; }
+
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #b0c4dd;
+            position: fixed;
+            top: 0; left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform var(--transition);
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-brand {
+            padding: 18px 22px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: var(--header-height);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .sidebar-brand i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+        }
+        .sidebar-brand span { letter-spacing: 0.3px; -webkit-text-fill-color: #fff; }
+
+        .sidebar-menu { padding: 20px 0 30px; flex: 1; }
+        .sidebar-menu .menu-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #4a6180;
+            padding: 12px 22px 6px;
+            font-weight: 500;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 22px;
+            color: #a0b6d4;
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            margin: 2px 8px;
+            border-radius: 6px;
+        }
+        .sidebar-menu a i {
+            width: 18px;
+            font-size: 15px;
+            text-align: center;
+            color: #4a6180;
+        }
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+        .sidebar-menu a:hover i,
+        .sidebar-menu a.active i { color: var(--primary); }
+
+        /* ===== 主内容 ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .topbar {
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(230, 236, 243, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 18px; }
+        .topbar-left .breadcrumb { font-size: 14px; color: var(--text-secondary); }
+        .topbar-left .breadcrumb span { color: var(--text-main); font-weight: 500; }
+        .topbar-left .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+        }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+        .topbar-right .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 4px 12px 4px 4px;
+            border-radius: 30px;
+            background: var(--bg-main);
+            cursor: default;
+        }
+        .topbar-right .user .avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(43, 95, 217, 0.25);
+        }
+        .topbar-right .notification {
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .topbar-right .notification:hover { background: var(--bg-main); color: var(--text-main); }
+        .topbar-right .notification .dot {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 8px; height: 8px;
+            background: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        /* ===== 页面内容 ===== */
+        .page-content { padding: 28px 32px 40px; flex: 1; }
+
+        /* ============================================================
+           系统列表页
+           ============================================================ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .page-header .title-group h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .page-header .title-group .sub {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .action-bar .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.2px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .action-bar .btn i { font-size: 14px; }
+        .action-bar .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .action-bar .btn-primary {
+            background: var(--primary-gradient);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(43, 95, 217, 0.30);
+        }
+        .action-bar .btn-primary:hover { box-shadow: 0 6px 20px rgba(43, 95, 217, 0.40); }
+        .action-bar .btn-success {
+            background: #1d9b5c;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(29, 155, 92, 0.25);
+        }
+        .action-bar .btn-success:hover { background: #15804b; box-shadow: 0 6px 18px rgba(29, 155, 92, 0.35); }
+        .action-bar .btn-export {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .action-bar .btn-export:hover { background: var(--bg-main); border-color: #b8c6d8; }
+        .action-bar .btn-danger-outline {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        .action-bar .btn-danger-outline:hover { background: #fde8e8; border-color: #dc3545; }
+
+        /* ===== 工具栏 ===== */
+        .toolbar {
+            background: var(--card-bg);
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 16px;
+            border: 1px solid rgba(230, 236, 243, 0.4);
+        }
+        .toolbar .search-box {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: var(--bg-main);
+            border-radius: 30px;
+            padding: 0 16px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .toolbar .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(43, 95, 217, 0.08);
+            background: var(--card-bg);
+        }
+        .toolbar .search-box i { color: var(--text-light); font-size: 14px; }
+        .toolbar .search-box input {
+            border: none;
+            background: transparent;
+            padding: 9px 12px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+            color: var(--text-main);
+        }
+        .toolbar .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .toolbar .filters select {
+            padding: 7px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 13px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+            min-width: 120px;
+        }
+        .toolbar .filters select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(43, 95, 217, 0.06);
+        }
+        .toolbar .btn-reset {
+            padding: 7px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toolbar .btn-reset:hover { background: var(--bg-main); border-color: #b8c6d8; }
+
+        /* ===== 系统卡片网格 ===== */
+        .system-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .system-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px 22px 18px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(230, 236, 243, 0.5);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .system-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        .system-card .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+        .system-card .sys-name { font-size: 17px; font-weight: 600; color: var(--text-main); }
+        .system-card .sys-code { font-size: 13px; color: var(--text-light); margin-bottom: 8px; }
+        .system-card .sys-status {
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .sys-status.status-building { background: #e8f0fd; color: #1a5fb0; }
+        .sys-status.status-online { background: #e8f5e9; color: #1d7a3c; }
+        .sys-status.status-offline { background: #fde8e8; color: #b02a37; }
+        .sys-status.status-maintaining { background: #fff3e0; color: #b7651a; }
+
+        .system-card .sys-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 8px 0 12px;
+        }
+        .system-card .sys-meta span { display: flex; align-items: center; gap: 4px; }
+        .system-card .sys-meta i { color: var(--text-light); font-size: 13px; width: 16px; }
+        .system-card .card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .system-card .card-actions .btn-sm {
+            padding: 5px 14px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .system-card .card-actions .btn-sm.view { background: var(--primary-light); color: var(--primary); }
+        .system-card .card-actions .btn-sm.view:hover { background: var(--primary); color: #fff; }
+        .system-card .card-actions .btn-sm.edit { background: var(--bg-main); color: var(--text-secondary); }
+        .system-card .card-actions .btn-sm.edit:hover { background: #e2e8f0; }
+        .system-card .card-actions .btn-sm.delete { background: #fde8e8; color: #b02a37; }
+        .system-card .card-actions .btn-sm.delete:hover { background: #fcc; }
+
+        /* ===== 表格 ===== */
+        .table-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid rgba(230, 236, 243, 0.4);
+        }
+        .table-scroll { overflow-x: auto; padding: 0 4px 4px 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table th {
+            background: #f7faff;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1.5px solid var(--border-color);
+            white-space: nowrap;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        table td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        table tr:last-child td { border-bottom: none; }
+        table tr:hover td { background: #f8faff; }
+        table td .tag {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        table td .tag.env-prod { background: #fde8e8; color: #b02a37; }
+        table td .tag.env-test { background: #e8f0fd; color: #1a5fb0; }
+        table td .tag.env-dev { background: #e8f5e9; color: #1d7a3c; }
+
+        .action-group { display: flex; gap: 4px; }
+        .action-group .btn-icon {
+            width: 30px; height: 30px;
+            border: none;
+            border-radius: 30px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .action-group .btn-icon:hover { background: var(--bg-main); }
+        .action-group .btn-icon.view:hover { color: #1d9b5c; background: #e8f5e9; }
+        .action-group .btn-icon.edit:hover { color: var(--primary); background: var(--primary-light); }
+        .action-group .btn-icon.delete:hover { color: #dc3545; background: #fde8e8; }
+
+        .table-footer {
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #fafcff;
+        }
+        .table-footer .pagination { display: flex; gap: 4px; align-items: center; }
+        .table-footer .pagination button {
+            padding: 5px 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .table-footer .pagination button:hover:not(:disabled) { background: var(--bg-main); border-color: var(--border-color); }
+        .table-footer .pagination button.active {
+            background: var(--primary-gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(43, 95, 217, 0.25);
+        }
+        .table-footer .pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* ===== Tab 样式 ===== */
+        .tabs-container {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .tabs-container .tab-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+        .tabs-container .tab-btn:hover { background: var(--bg-main); color: var(--text-main); }
+        .tabs-container .tab-btn.active {
+            background: var(--primary-gradient);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* ===== 返回链接 ===== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 4px 0;
+        }
+        .back-link:hover { color: var(--primary-dark); gap: 10px; }
+
+        /* ===== 表格提示条 ===== */
+        .table-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            background: #f7faff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .table-hint i { color: var(--primary); }
+
+        /* ============================================================
+           架构图卡片
+           ============================================================ */
+        .arch-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 28px 32px 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.25s ease;
+        }
+        .arch-card:hover { box-shadow: var(--shadow-md); }
+        .arch-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .arch-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .arch-title i {
+            color: var(--primary);
+            font-size: 20px;
+            background: var(--primary-light);
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .arch-header .arch-meta {
+            font-size: 13px;
+            color: var(--text-light);
+            background: var(--bg-main);
+            padding: 4px 14px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .upload-area {
+            border: 2px dashed #d0d8e6;
+            border-radius: 14px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #fafcff;
+            position: relative;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f0f5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(43, 95, 217, 0.08);
+        }
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(43, 95, 217, 0.12);
+        }
+        .upload-area .upload-icon {
+            font-size: 48px;
+            color: #b0c4dd;
+            margin-bottom: 12px;
+            display: block;
+            transition: color 0.25s ease;
+        }
+        .upload-area:hover .upload-icon { color: var(--primary); }
+        .upload-area .upload-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
+        .upload-area .upload-hint { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+        .upload-area .upload-formats {
+            font-size: 12px;
+            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-main);
+            padding: 4px 14px;
+            border-radius: 30px;
+            margin-top: 8px;
+        }
+        .upload-area .upload-arrow {
+            position: absolute;
+            right: 24px; bottom: 20px;
+            font-size: 20px;
+            color: #d0d8e6;
+            transition: all 0.25s ease;
+        }
+        .upload-area:hover .upload-arrow { color: var(--primary); transform: translateX(4px); }
+
+        .image-preview {
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #fafcff;
+            display: none;
+        }
+        .image-preview.show { display: block; }
+        .image-preview img {
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            display: block;
+            background: #fff;
+            padding: 8px;
+        }
+        .image-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #f7faff;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .image-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .image-actions .btn-view { background: var(--primary-light); color: var(--primary); }
+        .image-actions .btn-view:hover { background: #d6e2fb; transform: translateY(-1px); }
+        .image-actions .btn-replace { background: var(--bg-main); color: var(--text-secondary); }
+        .image-actions .btn-replace:hover { background: #e6ecf3; transform: translateY(-1px); }
+        .image-actions .btn-remove { background: #fde8e8; color: #b02a37; }
+        .image-actions .btn-remove:hover { background: #fcc; transform: translateY(-1px); }
+
+        .empty-state {
+            text-align: center;
+            padding: 12px 0 4px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        .empty-state i { font-size: 28px; color: #d0d8e6; display: block; margin-bottom: 6px; }
+
+        /* ===== 模态框 ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 24, 37, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            animation: modalFade 0.2s ease;
+        }
+        .modal.modal-lg { max-width: 900px; }
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.96) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-header .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0 6px;
+            transition: var(--transition);
+            border-radius: 30px;
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-header .close:hover { background: var(--bg-main); color: var(--text-main); }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+
+        /* 分组标题 */
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 8px 0 10px;
+            margin-top: 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title:first-child { margin-top: 0; }
+        .form-section-title i { font-size: 14px; }
+
+        .modal-body .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+        }
+        .modal-body .form-grid .full { grid-column: 1 / -1; }
+        .modal-body .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .modal-body .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .modal-body .form-group label .required { color: #dc3545; margin-left: 2px; }
+        .modal-body .form-group input,
+        .modal-body .form-group select,
+        .modal-body .form-group textarea {
+            padding: 9px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+        .modal-body .form-group input:focus,
+        .modal-body .form-group select:focus,
+        .modal-body .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(43, 95, 217, 0.06);
+        }
+        .modal-body .form-group textarea { resize: vertical; min-height: 60px; }
+        .modal-body .form-group .hint { font-size: 12px; color: var(--text-light); }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-footer .btn {
+            padding: 8px 22px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .modal-footer .btn-secondary { background: var(--bg-main); color: var(--text-secondary); }
+        .modal-footer .btn-secondary:hover { background: #e2e8f0; }
+        .modal-footer .btn-primary {
+            background: var(--primary-gradient);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(43, 95, 217, 0.25);
+        }
+        .modal-footer .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(43, 95, 217, 0.35);
+            transform: translateY(-1px);
+        }
+        .modal-footer .btn-danger { background: #dc3545; color: #fff; }
+        .modal-footer .btn-danger:hover { background: #b02a37; }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            background: #fafcff;
+        }
+        .upload-zone:hover { border-color: var(--primary); background: var(--primary-light); }
+        .upload-zone i { font-size: 36px; color: var(--text-light); margin-bottom: 8px; }
+        .upload-zone .file-name { margin-top: 6px; font-size: 13px; color: var(--primary); font-weight: 500; }
+
+        /* ============================================================
+           详情抽屉
+           ============================================================ */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 24, 37, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 2100;
+            display: none;
+            justify-content: flex-end;
+        }
+        .drawer-overlay.show { display: flex; }
+        .drawer {
+            background: var(--card-bg);
+            width: 520px;
+            max-width: 92vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15);
+            animation: drawerSlide 0.25s ease;
+        }
+        @keyframes drawerSlide {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f7faff;
+        }
+        .drawer-header h3 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .drawer-header h3 i { color: var(--primary); }
+        .drawer-header .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0 6px;
+            border-radius: 30px;
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .drawer-header .close:hover { background: var(--bg-main); color: var(--text-main); }
+        .drawer-body { padding: 20px 24px 40px; overflow-y: auto; flex: 1; }
+
+        .detail-section {
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .detail-section-header {
+            padding: 12px 16px;
+            background: #f7faff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            user-select: none;
+            transition: var(--transition);
+        }
+        .detail-section-header:hover { background: #eef4ff; }
+        .detail-section-header .arrow {
+            transition: transform 0.25s ease;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .detail-section-header.open .arrow { transform: rotate(90deg); }
+        .detail-section-header .count {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 400;
+            margin-left: 6px;
+        }
+        .detail-section-body {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.25s ease;
+        }
+        .detail-section-body.open {
+            padding: 14px 16px;
+            max-height: 2000px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eef2f8;
+            font-size: 13px;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .label {
+            width: 120px;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .detail-row .value {
+            color: var(--text-main);
+            word-break: break-all;
+            flex: 1;
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            background: var(--text-main);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: flex; }
+        .toast.success { background: #1d9b5c; }
+        .toast.error { background: #dc3545; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .topbar-left .hamburger { display: block; }
+            .modal-body .form-grid { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; align-items: stretch; }
+            .action-bar { justify-content: flex-start; }
+            .system-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+            .arch-card { padding: 20px 16px 24px; }
+        }
+        @media (max-width: 600px) {
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar .search-box { min-width: auto; }
+            .toolbar .filters { flex-direction: column; align-items: stretch; }
+            .table-footer { flex-direction: column; align-items: stretch; text-align: center; }
+            .action-bar { flex-wrap: wrap; }
+            .action-bar .btn { flex: 1; justify-content: center; }
+            .system-grid { grid-template-columns: 1fr; }
+            .tabs-container {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 6px 8px;
+                gap: 2px;
+            }
+            .tabs-container .tab-btn { font-size: 12px; padding: 4px 12px; }
+            .arch-header { flex-direction: column; align-items: flex-start; }
+            .upload-area { padding: 32px 16px; }
+            .upload-area .upload-icon { font-size: 36px; }
+            .upload-area .upload-arrow { display: none; }
+            .image-actions .btn { font-size: 12px; padding: 6px 14px; }
+            .drawer { width: 100vw; max-width: 100vw; }
+            .detail-row { flex-direction: column; }
+            .detail-row .label { width: auto; margin-bottom: 2px; }
+        }
+
+        .text-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+        .highlight { font-weight: 600; color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 侧边栏 ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-cubes"></i>
+            <span>系统技术资产</span>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">导航</div>
+            <a href="#" class="active" data-page="tech-asset"><i class="fas fa-list"></i> 系统列表</a>
+        </nav>
+    </aside>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">/ <span id="breadcrumbTitle">系统列表</span></div>
+            </div>
+            <div class="topbar-right">
+                <span class="notification"><i class="far fa-bell"></i><span class="dot"></span></span>
+                <div class="user">
+                    <span class="avatar">张</span>
+                    <span>张工</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content" id="pageContent"></div>
+    </div>
+
+    <!-- ===== 模态框 ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalContent"></div>
+    </div>
+
+    <!-- ===== 详情抽屉 ===== -->
+    <div class="drawer-overlay" id="drawerOverlay">
+        <div class="drawer" id="drawerContent"></div>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // ============================================================
+        // 字段定义
+        // ============================================================
+
+        // 15 个 Tab 的字段定义
+        const FIELD_DEFS = {
+            basic: ['项目名称', '项目编号', '组长', '组长手机', '项目经理', '项目经理手机', '系统介绍', '系统类别', 'svn文档地址',
+                'git代码地址', '模块名', '分支名', '分支描述', '分支地址'
+            ],
+            deploy: ['序号', '模块名称', '部署应用', '主机名', 'IP地址', '容器IP', '链接模版', '机房', 'CPU（核）', '内存（G）',
+                '系统盘（G）', '数据盘（G）', '操作系统', '快照备份需求', '服务器类型', '节点数量', '租户', 'VPC', '安全组',
+                '应用描述', '系统环境', '运行环境', '部署网段', '路径信息', '文件挂载', '是否涉及批量操作', '批量调度平台',
+                '是否纳入应用监控', '网络QoS策略', '域名', '国产化', 'ETL工具', '备注'
+            ],
+            interface: ['序号', '模块名称', '网段', '类名', '方法名', '服务地址', '调用对象（外部系统）', '备注'],
+            database: ['序号', '数据库地址', '数据库IP', '端口号', '数据库名', '用户名', '系统环境', '运行环境', '部署网段',
+                '数据库版本信息', '备注'
+            ],
+            middleware: ['序号', '中间件', '版本号', '中间件类型', 'IP', '端口', '系统环境', '运行环境', '部署网段', '备注'],
+            network: ['序号', '源地址', '源应用系统名称', '目的地址', '目的应用系统名称', '协议（TCP/UDP/ICMP）', '目的端口号',
+                '动作（允许/拒绝）', '策略有效期（临时/永久）', '用途（业务说明，需求必要性）', '是否对证联网开放',
+                '是否对互联网开放', 'Nginx CLB地址及实例'
+            ],
+            backup: ['序号', '服务器名称', '数据类型', '文件路径', '备份策略', '保留时间', '操作系统类型', '数据库版本'],
+            config: ['序号', '配置类型（应用/数据库）', '配置项ID', '配置项说明'],
+            datadist: ['序号', '模块名称', '数据来源', '报送方式', '数据用途', '部署网段', '存储方式'],
+            fileexchange: ['序号', '模块名称', '网段', '交换说明', '源服务器IP', '源IP网段', '源服务器路径', '交换数据说明',
+                '文件生成方式', '源交换节点IP', '源交换节点路径', '交换数据说明', '文件加载方式', '目的服务器IP', '环境',
+                '目的服务器路径', '时间节点', '文件示例', '场景说明'
+            ],
+            techstack: ['序号', '模块名称', '数据库', '开发语言', '技术栈', '中间件（含版本号）', 'jar包、版本']
+        };
+
+        // 15 个 Tab 定义
+        const TABS = [
+            { key: 'basic', label: '基本信息' },
+            { key: 'deploy', label: '部署信息' },
+            { key: 'interface', label: '接口依赖' },
+            { key: 'database', label: '数据库' },
+            { key: 'middleware', label: '中间件' },
+            { key: 'network', label: '网络策略' },
+            { key: 'backup', label: '备份策略' },
+            { key: 'config', label: '配置项' },
+            { key: 'datadist', label: '数据分布' },
+            { key: 'fileexchange', label: '文件交换' },
+            { key: 'arch_overall', label: '总体架构图' },
+            { key: 'arch_app', label: '应用架构图' },
+            { key: 'arch_tech', label: '技术架构图' },
+            { key: 'techstack', label: '技术栈' },
+            { key: 'arch_deploy', label: '部署架构图' }
+        ];
+
+        // 部署信息的分组定义（用于详情抽屉 + 编辑弹窗）
+        const DEPLOY_GROUPS = [{
+            name: '基础信息',
+            icon: 'fa-info-circle',
+            fields: ['序号', '模块名称', '部署应用', '主机名', 'IP地址', '应用描述', '系统环境', '运行环境']
+        }, {
+            name: '资源配置',
+            icon: 'fa-microchip',
+            fields: ['容器IP', '机房', 'CPU（核）', '内存（G）', '系统盘（G）', '数据盘（G）', '操作系统', '服务器类型', '节点数量']
+        }, {
+            name: '网络配置',
+            icon: 'fa-network-wired',
+            fields: ['链接模版', '租户', 'VPC', '安全组', '部署网段', '域名', '网络QoS策略']
+        }, {
+            name: '运维配置',
+            icon: 'fa-tools',
+            fields: ['快照备份需求', '路径信息', '文件挂载', '是否涉及批量操作', '批量调度平台', '是否纳入应用监控', '国产化', 'ETL工具', '备注']
+        }];
+
+        // 部署信息表格显示的 10 列（精简）
+        const DEPLOY_TABLE_COLS = ['序号', '模块名称', '部署应用', '主机名', 'IP地址', '机房', 'CPU（核）', '内存（G）', '系统环境', '运行环境'];
+
+        // ============================================================
+        // 数据定义
+        // ============================================================
+
+        function createDefaultTechData() {
+            const td = {};
+            // 普通表格
+            td.basic = { fields: FIELD_DEFS.basic, data: [] };
+            td.deploy = { fields: FIELD_DEFS.deploy, data: [] };
+            td.interface = { fields: FIELD_DEFS.interface, data: [] };
+            td.database = { fields: FIELD_DEFS.database, data: [] };
+            td.middleware = { fields: FIELD_DEFS.middleware, data: [] };
+            td.network = { fields: FIELD_DEFS.network, data: [] };
+            td.backup = { fields: FIELD_DEFS.backup, data: [] };
+            td.config = { fields: FIELD_DEFS.config, data: [] };
+            td.datadist = { fields: FIELD_DEFS.datadist, data: [] };
+            td.fileexchange = { fields: FIELD_DEFS.fileexchange, data: [] };
+            td.techstack = { fields: FIELD_DEFS.techstack, data: [] };
+            // 架构图
+            td.arch_overall = { isArch: true, archKey: 'overall', imageData: null };
+            td.arch_app = { isArch: true, archKey: 'app', imageData: null };
+            td.arch_tech = { isArch: true, archKey: 'tech', imageData: null };
+            td.arch_deploy = { isArch: true, archKey: 'deploy', imageData: null };
+            return td;
+        }
+
+        let systems = [{
+            id: 'sys-001',
+            code: 'SYS-001',
+            name: '用户中心',
+            domain: '基础服务',
+            owner: '张三',
+            status: '已上线',
+            createdAt: '2026-01-15',
+            techData: {
+                basic: {
+                    fields: FIELD_DEFS.basic,
+                    data: [
+                        ['用户中心系统', 'UC-2026-001', '王磊', '13800001111', '李敏', '13900002222', '统一用户管理服务',
+                            '基础平台', 'http://svn.company.com/uc', 'https://git.company.com/uc', 'uc-core',
+                            'master', '主分支', 'https://git.company.com/uc/uc-core'
+                        ]
+                    ]
+                },
+                deploy: {
+                    fields: FIELD_DEFS.deploy,
+                    data: [
+                        ['1', 'uc-web', 'Nginx', 'web-01', '10.0.1.10', '/', '/', '北京A机房', '4', '8', '100', '500',
+                            'CentOS 7.9', '是', '虚拟机', '2', '默认租户', 'vpc-prod-01', 'sg-web-01', '前端Web服务',
+                            '生产', 'Linux', '10.0.1.0/24', '/app/web', '/data/web', '否', '/', '是', 'BEST-EFFORT',
+                            'uc.company.com', '是', '/', '主Web服务'
+                        ],
+                        ['2', 'uc-api', 'SpringBoot', 'api-01', '10.0.1.20', '/', '/', '北京A机房', '8', '16', '100', '1000',
+                            'CentOS 7.9', '是', '虚拟机', '3', '默认租户', 'vpc-prod-01', 'sg-api-01', 'API核心服务',
+                            '生产', 'Linux', '10.0.1.0/24', '/app/api', '/data/logs', '否', '/', '是', 'BEST-EFFORT',
+                            'api.uc.company.com', '是', '/', 'REST API'
+                        ]
+                    ]
+                },
+                interface: {
+                    fields: FIELD_DEFS.interface,
+                    data: [
+                        ['1', 'uc-api', '10.0.1.0/24', 'UserService', 'getUserInfo', 'http://user-svc:8080', '用户中心', '用户信息查询'],
+                        ['2', 'uc-api', '10.0.1.0/24', 'AuthService', 'validateToken', 'http://auth-svc:8081', '认证中心', 'Token校验']
+                    ]
+                },
+                database: {
+                    fields: FIELD_DEFS.database,
+                    data: [
+                        ['1', 'mysql-master.db.company.com', '10.0.3.10', '3306', 'uc_db', 'uc_user', '生产', 'Linux',
+                            '10.0.3.0/24', 'MySQL 8.0.32', '主库'
+                        ],
+                        ['2', 'mysql-slave.db.company.com', '10.0.3.20', '3306', 'uc_db', 'uc_user', '生产', 'Linux',
+                            '10.0.3.0/24', 'MySQL 8.0.32', '从库'
+                        ]
+                    ]
+                },
+                middleware: {
+                    fields: FIELD_DEFS.middleware,
+                    data: [
+                        ['1', 'Redis', '7.0.5', '缓存', '10.0.4.10', '6379', '生产', 'Linux', '10.0.4.0/24', '缓存服务'],
+                        ['2', 'RabbitMQ', '3.11.5', '消息队列', '10.0.4.20', '5672', '生产', 'Linux', '10.0.4.0/24', '消息中间件']
+                    ]
+                },
+                network: {
+                    fields: FIELD_DEFS.network,
+                    data: [
+                        ['1', '10.0.1.0/24', 'uc-web', '10.0.3.0/24', 'uc-db', 'TCP', '3306', '允许', '永久',
+                            'Web访问数据库', '否', '否', 'clb-uc-01'
+                        ],
+                        ['2', '10.0.1.0/24', 'uc-api', '10.0.4.0/24', 'uc-redis', 'TCP', '6379', '允许', '永久',
+                            'API访问缓存', '否', '否', '/'
+                        ]
+                    ]
+                },
+                backup: {
+                    fields: FIELD_DEFS.backup,
+                    data: [
+                        ['1', 'mysql-master', 'MySQL', '/var/lib/mysql', '每日全备', '30天', 'Linux', 'MySQL 8.0.32'],
+                        ['2', 'uc-api-01', '文件', '/app/api/logs', '每日增量', '7天', 'Linux', '/']
+                    ]
+                },
+                config: {
+                    fields: FIELD_DEFS.config,
+                    data: [
+                        ['1', '应用', 'uc.app.name', '用户中心应用名称'],
+                        ['2', '应用', 'uc.app.port', '用户中心应用端口'],
+                        ['3', '数据库', 'uc.db.url', '用户中心数据库连接地址']
+                    ]
+                },
+                datadist: {
+                    fields: FIELD_DEFS.datadist,
+                    data: [
+                        ['1', 'uc-api', '用户中心', 'API接口', '用户信息存储', '10.0.1.0/24', 'MySQL'],
+                        ['2', 'uc-batch', '认证中心', 'ETL批量', '权限数据同步', '10.0.2.0/24', 'MySQL + OSS']
+                    ]
+                },
+                fileexchange: {
+                    fields: FIELD_DEFS.fileexchange,
+                    data: [
+                        ['1', 'uc-batch', '10.0.2.0/24', '每日用户同步', '10.0.2.30', '10.0.2.0/24', '/data/source',
+                            '用户JSON文件', '定时生成', '10.0.2.30', '/data/exchange', '用户数据', 'DataX加载', '10.0.3.10',
+                            '生产', '/data/target', '每日02:00', 'user_20260820.json', '日度用户同步'
+                        ]
+                    ]
+                },
+                arch_overall: { isArch: true, archKey: 'overall', imageData: null },
+                arch_app: { isArch: true, archKey: 'app', imageData: null },
+                arch_tech: { isArch: true, archKey: 'tech', imageData: null },
+                techstack: {
+                    fields: FIELD_DEFS.techstack,
+                    data: [
+                        ['1', 'uc-api', 'MySQL 8.0', 'Java 17', 'Spring Boot 3.0, MyBatis-Plus', 'Redis 7.0, RabbitMQ 3.11',
+                            'spring-boot-3.0.0.jar'
+                        ],
+                        ['2', 'uc-web', 'MySQL 8.0', 'JavaScript', 'Vue 3, Vite, Element Plus', 'Nginx 1.22', '/']
+                    ]
+                },
+                arch_deploy: { isArch: true, archKey: 'deploy', imageData: null }
+            }
+        }, {
+            id: 'sys-002',
+            code: 'SYS-002',
+            name: '订单系统',
+            domain: '交易域',
+            owner: '李四',
+            status: '在建',
+            createdAt: '2026-03-20',
+            techData: {
+                basic: {
+                    fields: FIELD_DEFS.basic,
+                    data: [
+                        ['订单管理系统', 'OMS-2026-001', '赵刚', '13800003333', '钱丽', '13900004444', '统一订单处理服务',
+                            '交易平台', 'http://svn.company.com/oms', 'https://git.company.com/oms', 'oms-core',
+                            'develop', '开发分支', 'https://git.company.com/oms/oms-core'
+                        ]
+                    ]
+                },
+                deploy: {
+                    fields: FIELD_DEFS.deploy,
+                    data: [
+                        ['1', 'oms-api', 'SpringBoot', 'oms-api-01', '10.0.5.20', '/', '/', '上海B机房', '8', '16', '100',
+                            '1000', 'CentOS 7.9', '否', '虚拟机', '1', '默认租户', 'vpc-test-01', 'sg-oms-01',
+                            '订单API服务', '测试', 'Linux', '10.0.5.0/24', '/app/oms', '/data/logs', '否', '/', '是',
+                            'BEST-EFFORT', 'oms-test.company.com', '是', '/', '测试环境API'
+                        ]
+                    ]
+                },
+                interface: {
+                    fields: FIELD_DEFS.interface,
+                    data: [
+                        ['1', 'oms-api', '10.0.5.0/24', 'OrderService', 'createOrder', 'http://order-svc:8080', '订单中心', '创建订单'],
+                        ['2', 'oms-api', '10.0.5.0/24', 'PaymentService', 'processPayment', 'http://pay-svc:8081', '支付系统', '支付处理']
+                    ]
+                },
+                database: {
+                    fields: FIELD_DEFS.database,
+                    data: [
+                        ['1', 'mysql-test.db.company.com', '10.0.6.10', '3306', 'oms_db', 'oms_user', '测试', 'Linux',
+                            '10.0.6.0/24', 'MySQL 8.0.35', '测试库'
+                        ]
+                    ]
+                },
+                middleware: {
+                    fields: FIELD_DEFS.middleware,
+                    data: [
+                        ['1', 'Redis', '7.2.0', '缓存', '10.0.7.10', '6379', '测试', 'Linux', '10.0.7.0/24', '缓存服务']
+                    ]
+                },
+                network: {
+                    fields: FIELD_DEFS.network,
+                    data: [
+                        ['1', '10.0.5.0/24', 'oms-api', '10.0.6.0/24', 'oms-db', 'TCP', '3306', '允许', '临时',
+                            '测试环境数据库访问', '否', '否', '/'
+                        ]
+                    ]
+                },
+                backup: {
+                    fields: FIELD_DEFS.backup,
+                    data: [
+                        ['1', 'mysql-test', 'MySQL', '/var/lib/mysql', '每周全备', '14天', 'Linux', 'MySQL 8.0.35']
+                    ]
+                },
+                config: {
+                    fields: FIELD_DEFS.config,
+                    data: [
+                        ['1', '应用', 'oms.app.name', '订单系统应用名称'],
+                        ['2', '应用', 'oms.app.port', '订单系统端口']
+                    ]
+                },
+                datadist: {
+                    fields: FIELD_DEFS.datadist,
+                    data: [
+                        ['1', 'oms-api', '订单中心', 'API接口', '订单数据存储', '10.0.5.0/24', 'MySQL']
+                    ]
+                },
+                fileexchange: {
+                    fields: FIELD_DEFS.fileexchange,
+                    data: [
+                        ['1', 'oms-batch', '10.0.6.0/24', '每日订单汇总', '10.0.6.30', '10.0.6.0/24', '/data/source',
+                            '订单汇总CSV', '定时生成', '10.0.6.30', '/data/exchange', '订单数据', 'DataX加载', '10.0.6.10',
+                            '测试', '/data/target', '每日03:00', 'order_20260820.csv', '日度订单汇总'
+                        ]
+                    ]
+                },
+                arch_overall: { isArch: true, archKey: 'overall', imageData: null },
+                arch_app: { isArch: true, archKey: 'app', imageData: null },
+                arch_tech: { isArch: true, archKey: 'tech', imageData: null },
+                techstack: {
+                    fields: FIELD_DEFS.techstack,
+                    data: [
+                        ['1', 'oms-api', 'MySQL 8.0', 'Java 17', 'Spring Boot 3.1, MyBatis-Plus', 'Redis 7.2', 'spring-boot-3.1.0.jar']
+                    ]
+                },
+                arch_deploy: { isArch: true, archKey: 'deploy', imageData: null }
+            }
+        }, {
+            id: 'sys-003',
+            code: 'SYS-003',
+            name: '支付系统',
+            domain: '交易域',
+            owner: '王五',
+            status: '已上线',
+            createdAt: '2026-05-10',
+            techData: {
+                basic: {
+                    fields: FIELD_DEFS.basic,
+                    data: [
+                        ['支付中台系统', 'PMS-2026-001', '孙强', '13800005555', '周婷', '13900006666', '统一支付处理中台',
+                            '金融平台', 'http://svn.company.com/pms', 'https://git.company.com/pms', 'pms-core',
+                            'master', '主分支', 'https://git.company.com/pms/pms-core'
+                        ]
+                    ]
+                },
+                deploy: {
+                    fields: FIELD_DEFS.deploy,
+                    data: [
+                        ['1', 'pms-web', 'Nginx', 'pms-web-01', '10.0.8.10', '/', '/', '北京A机房', '4', '8', '100', '500',
+                            'CentOS 7.9', '是', '虚拟机', '2', '默认租户', 'vpc-prod-01', 'sg-pms-web', '支付前端',
+                            '生产', 'Linux', '10.0.8.0/24', '/app/web', '/data/web', '否', '/', '是', 'BEST-EFFORT',
+                            'pay.company.com', '是', '/', '支付门户'
+                        ],
+                        ['2', 'pms-api', 'SpringBoot', 'pms-api-01', '10.0.8.20', '/', '/', '北京A机房', '8', '16', '100',
+                            '1000', 'CentOS 7.9', '是', '虚拟机', '3', '默认租户', 'vpc-prod-01', 'sg-pms-api',
+                            '支付API服务', '生产', 'Linux', '10.0.8.0/24', '/app/api', '/data/logs', '否', '/', '是',
+                            'BEST-EFFORT', 'api.pay.company.com', '是', '/', '支付核心API'
+                        ],
+                        ['3', 'pms-settle', 'Go', 'pms-settle-01', '10.0.9.30', '/', '/', '北京A机房', '8', '16', '100',
+                            '500', 'CentOS 7.9', '是', '虚拟机', '1', '默认租户', 'vpc-prod-01', 'sg-pms-settle',
+                            '结算服务', '生产', 'Linux', '10.0.9.0/24', '/app/settle', '/data/settle', '是', 'XXL-JOB',
+                            '是', 'BEST-EFFORT', '/', '是', '/', '日终结算'
+                        ]
+                    ]
+                },
+                interface: {
+                    fields: FIELD_DEFS.interface,
+                    data: [
+                        ['1', 'pms-api', '10.0.8.0/24', 'PaymentService', 'pay', 'http://pay-svc:8080', '支付网关', '支付请求'],
+                        ['2', 'pms-api', '10.0.8.0/24', 'RefundService', 'refund', 'http://refund-svc:8081', '退款中心', '退款处理'],
+                        ['3', 'pms-settle', '10.0.9.0/24', 'SettleService', 'dailySettle', 'http://settle-svc:8082', '结算中心', '日终结算']
+                    ]
+                },
+                database: {
+                    fields: FIELD_DEFS.database,
+                    data: [
+                        ['1', 'mysql-master.db.company.com', '10.0.10.10', '3306', 'pms_db', 'pms_user', '生产', 'Linux',
+                            '10.0.10.0/24', 'MySQL 8.0.32', '主库'
+                        ],
+                        ['2', 'mysql-slave.db.company.com', '10.0.10.20', '3306', 'pms_db', 'pms_user', '生产', 'Linux',
+                            '10.0.10.0/24', 'MySQL 8.0.32', '从库'
+                        ],
+                        ['3', 'mysql-report.db.company.com', '10.0.10.30', '3306', 'pms_report', 'report_user',
+                            '生产', 'Linux', '10.0.10.0/24', 'MySQL 8.0.32', '报表库'
+                        ]
+                    ]
+                },
+                middleware: {
+                    fields: FIELD_DEFS.middleware,
+                    data: [
+                        ['1', 'Redis', '7.0.5', '缓存', '10.0.11.10', '6379', '生产', 'Linux', '10.0.11.0/24', '缓存服务'],
+                        ['2', 'RabbitMQ', '3.11.5', '消息队列', '10.0.11.20', '5672', '生产', 'Linux', '10.0.11.0/24', '消息中间件'],
+                        ['3', 'Nacos', '2.2.1', '注册中心', '10.0.11.30', '8848', '生产', 'Linux', '10.0.11.0/24', '服务注册发现']
+                    ]
+                },
+                network: {
+                    fields: FIELD_DEFS.network,
+                    data: [
+                        ['1', '10.0.8.0/24', 'pms-web', '10.0.10.0/24', 'pms-db', 'TCP', '3306', '允许', '永久', 'Web访问数据库', '否', '否', 'clb-pms-01'],
+                        ['2', '10.0.8.0/24', 'pms-api', '10.0.11.0/24', 'pms-redis', 'TCP', '6379', '允许', '永久', 'API访问缓存', '否', '否', '/']
+                    ]
+                },
+                backup: {
+                    fields: FIELD_DEFS.backup,
+                    data: [
+                        ['1', 'mysql-master', 'MySQL', '/var/lib/mysql', '每日全备', '30天', 'Linux', 'MySQL 8.0.32'],
+                        ['2', 'pms-api-01', '文件', '/app/api/logs', '每日增量', '7天', 'Linux', '/'],
+                        ['3', 'pms-settle-01', '文件', '/app/settle', '每日全备', '30天', 'Linux', '/']
+                    ]
+                },
+                config: {
+                    fields: FIELD_DEFS.config,
+                    data: [
+                        ['1', '应用', 'pms.app.name', '支付中台应用名称'],
+                        ['2', '应用', 'pms.app.port', '支付中台端口'],
+                        ['3', '数据库', 'pms.db.url', '支付数据库地址']
+                    ]
+                },
+                datadist: {
+                    fields: FIELD_DEFS.datadist,
+                    data: [
+                        ['1', 'pms-api', '支付网关', 'API接口', '支付交易数据', '10.0.8.0/24', 'MySQL'],
+                        ['2', 'pms-settle', '结算中心', 'ETL批量', '结算对账数据', '10.0.9.0/24', 'MySQL + OSS']
+                    ]
+                },
+                fileexchange: {
+                    fields: FIELD_DEFS.fileexchange,
+                    data: [
+                        ['1', 'pms-settle', '10.0.9.0/24', '每日对账文件', '10.0.9.30', '10.0.9.0/24', '/data/source',
+                            '对账CSV文件', '定时生成', '10.0.9.30', '/data/exchange', '对账数据', 'DataX加载', '10.0.10.10',
+                            '生产', '/data/target', '每日04:00', 'settle_20260820.csv', '日终对账'
+                        ]
+                    ]
+                },
+                arch_overall: { isArch: true, archKey: 'overall', imageData: null },
+                arch_app: { isArch: true, archKey: 'app', imageData: null },
+                arch_tech: { isArch: true, archKey: 'tech', imageData: null },
+                techstack: {
+                    fields: FIELD_DEFS.techstack,
+                    data: [
+                        ['1', 'pms-api', 'MySQL 8.0', 'Java 17', 'Spring Boot 3.0, MyBatis-Plus', 'Redis 7.0, Nacos 2.2, RabbitMQ 3.11',
+                            'spring-boot-3.0.0.jar'
+                        ],
+                        ['2', 'pms-settle', 'MySQL 8.0', 'Go 1.21', 'Gin, GORM', 'Redis 7.0', '/']
+                    ]
+                },
+                arch_deploy: { isArch: true, archKey: 'deploy', imageData: null }
+            }
+        }, {
+            id: 'sys-004',
+            code: 'SYS-004',
+            name: '日志平台',
+            domain: '运维域',
+            owner: '赵六',
+            status: '维护中',
+            createdAt: '2025-11-01',
+            techData: {
+                basic: {
+                    fields: FIELD_DEFS.basic,
+                    data: [
+                        ['统一日志平台', 'LOG-2025-001', '吴刚', '13800007777', '郑梅', '13900008888', '集中日志采集与分析平台',
+                            '运维平台', 'http://svn.company.com/log', 'https://git.company.com/log', 'log-collector',
+                            'master', '主分支', 'https://git.company.com/log/log-collector'
+                        ]
+                    ]
+                },
+                deploy: {
+                    fields: FIELD_DEFS.deploy,
+                    data: [
+                        ['1', 'log-collector', 'Filebeat', 'log-col-01', '10.0.12.10', '/', '/', '北京A机房', '4', '8',
+                            '100', '500', 'CentOS 7.9', '是', '虚拟机', '1', '默认租户', 'vpc-prod-01', 'sg-log-01',
+                            '日志采集', '生产', 'Linux', '10.0.12.0/24', '/app/collector', '/data/logs', '否', '/', '是',
+                            'BEST-EFFORT', 'log.company.com', '是', '/', '采集节点'
+                        ],
+                        ['2', 'log-processor', 'Logstash', 'log-proc-01', '10.0.12.20', '/', '/', '北京A机房', '8', '16',
+                            '100', '1000', 'CentOS 7.9', '是', '虚拟机', '1', '默认租户', 'vpc-prod-01', 'sg-log-02',
+                            '日志处理', '生产', 'Linux', '10.0.12.0/24', '/app/processor', '/data/processed', '否',
+                            '/', '是', 'BEST-EFFORT', '/', '是', '/', '处理节点'
+                        ]
+                    ]
+                },
+                interface: {
+                    fields: FIELD_DEFS.interface,
+                    data: [
+                        ['1', 'log-collector', '10.0.12.0/24', 'LogCollector', 'collect', 'http://collector-svc:8080', '日志采集', '采集日志']
+                    ]
+                },
+                database: {
+                    fields: FIELD_DEFS.database,
+                    data: [
+                        ['1', 'es-cluster.db.company.com', '10.0.13.10', '9200', 'log_index', 'log_user', '生产', 'Linux',
+                            '10.0.13.0/24', 'Elasticsearch 7.17.9', 'ES集群'
+                        ]
+                    ]
+                },
+                middleware: {
+                    fields: FIELD_DEFS.middleware,
+                    data: [
+                        ['1', 'Kafka', '3.4.0', '消息队列', '10.0.14.10', '9092', '生产', 'Linux', '10.0.14.0/24', '日志消息队列']
+                    ]
+                },
+                network: {
+                    fields: FIELD_DEFS.network,
+                    data: [
+                        ['1', '10.0.12.0/24', 'log-collector', '10.0.14.0/24', 'kafka', 'TCP', '9092', '允许', '永久',
+                            '日志采集上报', '否', '否', '/'
+                        ]
+                    ]
+                },
+                backup: {
+                    fields: FIELD_DEFS.backup,
+                    data: [
+                        ['1', 'es-node-01', 'Elasticsearch', '/var/lib/elasticsearch', '每日快照', '15天', 'Linux', 'ES 7.17.9']
+                    ]
+                },
+                config: {
+                    fields: FIELD_DEFS.config,
+                    data: [
+                        ['1', '应用', 'log.collector.path', '日志采集路径'],
+                        ['2', '应用', 'log.kafka.topic', '日志Kafka主题']
+                    ]
+                },
+                datadist: {
+                    fields: FIELD_DEFS.datadist,
+                    data: [
+                        ['1', 'log-collector', '各业务系统', '日志推送', '日志存储与分析', '10.0.12.0/24', 'Elasticsearch']
+                    ]
+                },
+                fileexchange: {
+                    fields: FIELD_DEFS.fileexchange,
+                    data: [
+                        ['1', 'log-processor', '10.0.12.0/24', '日志归档', '10.0.12.20', '10.0.12.0/24', '/data/processed',
+                            '归档日志', '实时流', '10.0.12.20', '/data/archive', '归档数据', 'OSS上传', 'oss.company.com',
+                            '生产', '/log-archive/', '实时', 'log_20260820.gz', '日志归档'
+                        ]
+                    ]
+                },
+                arch_overall: { isArch: true, archKey: 'overall', imageData: null },
+                arch_app: { isArch: true, archKey: 'app', imageData: null },
+                arch_tech: { isArch: true, archKey: 'tech', imageData: null },
+                techstack: {
+                    fields: FIELD_DEFS.techstack,
+                    data: [
+                        ['1', 'log-collector', 'Elasticsearch', 'Go', 'Filebeat 7.17', 'Kafka 3.4', '/'],
+                        ['2', 'log-processor', 'Elasticsearch', 'Java', 'Logstash 7.17', 'Kafka 3.4', 'logstash-core-7.17.9.jar']
+                    ]
+                },
+                arch_deploy: { isArch: true, archKey: 'deploy', imageData: null }
+            }
+        }];
+
+        // ============================================================
+        // 状态
+        // ============================================================
+        let currentSystemId = null;
+        let currentTabIndex = 0;
+        let currentTablePage = 1;
+        const pageSize = 8;
+
+        // ============================================================
+        // DOM 引用
+        // ============================================================
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        const sidebarLinks = $$('.sidebar-menu a');
+        const breadcrumbTitle = $('#breadcrumbTitle');
+        const pageContent = $('#pageContent');
+        const modalOverlay = $('#modalOverlay');
+        const modalContent = $('#modalContent');
+        const drawerOverlay = $('#drawerOverlay');
+        const drawerContent = $('#drawerContent');
+        const toast = $('#toast');
+        const toastMsg = $('#toastMsg');
+        const hamburgerBtn = $('#hamburgerBtn');
+        const sidebar = $('#sidebar');
+
+        // ============================================================
+        // 工具函数
+        // ============================================================
+        function showToast(msg, type = 'success') {
+            toast.className = 'toast show ' + type;
+            toastMsg.textContent = msg;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function openModal(html, large = false) {
+            modalContent.className = 'modal' + (large ? ' modal-lg' : '');
+            modalContent.innerHTML = html;
+            modalOverlay.classList.add('show');
+        }
+
+        function closeModal() { modalOverlay.classList.remove('show'); }
+
+        function openDrawer(html) {
+            drawerContent.innerHTML = html;
+            drawerOverlay.classList.add('show');
+        }
+
+        function closeDrawer() { drawerOverlay.classList.remove('show'); }
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        drawerOverlay.addEventListener('click', (e) => {
+            if (e.target === drawerOverlay) closeDrawer();
+        });
+
+        function getStatusClass(status) {
+            const map = { '在建': 'status-building', '已上线': 'status-online', '已下线': 'status-offline', '维护中': 'status-maintaining' };
+            return map[status] || 'status-building';
+        }
+
+        function getSystemById(id) { return systems.find(s => s.id === id); }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ============================================================
+        // 系统列表页
+        // ============================================================
+        function renderSystemList() {
+            currentSystemId = null;
+            breadcrumbTitle.textContent = '系统列表';
+
+            sidebarLinks.forEach(a => {
+                a.classList.toggle('active', a.dataset.page === 'tech-asset');
+            });
+
+            const total = systems.length;
+
+            let html = `
+                <div class="page-header">
+                    <div class="title-group">
+                        <h1>系统技术资产</h1>
+                        <div class="sub"><i class="fas fa-database"></i> 共 <strong>${total}</strong> 个系统</div>
+                    </div>
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="handleAddSystem()"><i class="fas fa-plus"></i> 新增系统</button>
+                        <button class="btn btn-success" onclick="handleImportSystems()"><i class="fas fa-file-upload"></i> 导入系统</button>
+                        <button class="btn btn-export" onclick="handleExportSystems()"><i class="fas fa-file-download"></i> 导出系统</button>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="搜索系统名称、系统编码..." id="sysSearchInput" oninput="renderSystemList()">
+                    </div>
+                    <div class="filters">
+                        <select id="sysDomainFilter" onchange="renderSystemList()">
+                            <option value="">全部业务域</option>
+                            <option value="基础服务">基础服务</option>
+                            <option value="交易域">交易域</option>
+                            <option value="运维域">运维域</option>
+                            <option value="数据域">数据域</option>
+                        </select>
+                        <select id="sysStatusFilter" onchange="renderSystemList()">
+                            <option value="">全部状态</option>
+                            <option value="在建">在建</option>
+                            <option value="已上线">已上线</option>
+                            <option value="已下线">已下线</option>
+                            <option value="维护中">维护中</option>
+                        </select>
+                        <button class="btn-reset" onclick="resetSystemFilters()"><i class="fas fa-undo"></i> 重置</button>
+                    </div>
+                </div>
+
+                <div class="system-grid">
+            `;
+
+            const keyword = document.getElementById('sysSearchInput')?.value?.toLowerCase() || '';
+            const domainFilter = document.getElementById('sysDomainFilter')?.value || '';
+            const statusFilter = document.getElementById('sysStatusFilter')?.value || '';
+
+            let filtered = systems.filter(sys => {
+                const matchKeyword = !keyword || sys.name.toLowerCase().includes(keyword) || sys.code.toLowerCase().includes(keyword);
+                const matchDomain = !domainFilter || sys.domain === domainFilter;
+                const matchStatus = !statusFilter || sys.status === statusFilter;
+                return matchKeyword && matchDomain && matchStatus;
+            });
+
+            if (filtered.length === 0) {
+                html += `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-light);font-size:15px;">暂无匹配的系统</div>`;
+            } else {
+                filtered.forEach(sys => {
+                    const statusCls = getStatusClass(sys.status);
+                    html += `
+                        <div class="system-card">
+                            <div class="card-top">
+                                <div>
+                                    <div class="sys-name">${sys.name}</div>
+                                    <div class="sys-code">${sys.code}</div>
+                                </div>
+                                <span class="sys-status ${statusCls}">${sys.status}</span>
+                            </div>
+                            <div class="sys-meta">
+                                <span><i class="fas fa-tag"></i> ${sys.domain}</span>
+                                <span><i class="fas fa-user"></i> ${sys.owner}</span>
+                                <span><i class="fas fa-calendar-alt"></i> ${sys.createdAt}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-sm view" onclick="navigateToSystem('${sys.id}')"><i class="fas fa-eye"></i> 查看</button>
+                                <button class="btn-sm edit" onclick="handleEditSystem('${sys.id}')"><i class="fas fa-pen"></i> 编辑</button>
+                                <button class="btn-sm delete" onclick="handleDeleteSystem('${sys.id}')"><i class="fas fa-trash"></i> 删除</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>
+                <div style="margin-top:20px;font-size:13px;color:var(--text-secondary);text-align:right;">
+                    共 ${filtered.length} 个系统
+                </div>`;
+
+            pageContent.innerHTML = html;
+            sidebar.classList.remove('open');
+        }
+
+        // ============================================================
+        // 系统详情页
+        // ============================================================
+        function renderSystemDetail(systemId, tabIndex = 0, page = 1) {
+            const sys = getSystemById(systemId);
+            if (!sys) { showToast('系统不存在', 'error'); renderSystemList(); return; }
+
+            currentSystemId = systemId;
+            currentTabIndex = tabIndex;
+            currentTablePage = page;
+            breadcrumbTitle.textContent = `${sys.name} · 技术信息`;
+
+            sidebarLinks.forEach(a => { a.classList.toggle('active', a.dataset.page === 'tech-asset'); });
+
+            const tab = TABS[tabIndex];
+            if (!tab) return;
+
+            const tabData = sys.techData[tab.key];
+            const isArch = tabData && tabData.isArch;
+
+            // 判断是否部署信息
+            const isDeploy = tab.key === 'deploy';
+
+            // 分页
+            let allData = [];
+            let fields = [];
+            let total = 0;
+            let totalPages = 1;
+            let start = 0, end = 0;
+            let pageData = [];
+
+            if (!isArch && tabData) {
+                fields = tabData.fields || [];
+                allData = tabData.data || [];
+                total = allData.length;
+                totalPages = Math.max(1, Math.ceil(total / pageSize));
+                if (page > totalPages) currentTablePage = totalPages;
+                if (page < 1) currentTablePage = 1;
+                start = (currentTablePage - 1) * pageSize;
+                end = Math.min(start + pageSize, total);
+                pageData = allData.slice(start, end);
+            }
+
+            let archImageData = null;
+            if (isArch && tabData) archImageData = tabData.imageData || null;
+
+            let html = `
+                <div class="page-header">
+                    <div class="title-group">
+                        <button class="back-link" onclick="renderSystemList()"><i class="fas fa-arrow-left"></i> 返回系统列表</button>
+                        <h1 style="margin-top:8px;">${sys.name} <span style="font-size:16px;font-weight:400;color:var(--text-light);">${sys.code}</span></h1>
+                        <div class="sub" style="margin-top:2px;">
+                            <span class="sys-status ${getStatusClass(sys.status)}" style="font-size:12px;">${sys.status}</span>
+                            <span style="margin-left:12px;"><i class="fas fa-tag"></i> ${sys.domain}</span>
+                            <span style="margin-left:12px;"><i class="fas fa-user"></i> ${sys.owner}</span>
+                            <span style="margin-left:12px;"><i class="fas fa-calendar-alt"></i> ${sys.createdAt}</span>
+                        </div>
+                    </div>
+                    <div class="action-bar">
+                        <button class="btn btn-export" onclick="handleExportFullSystem('${sys.id}')"><i class="fas fa-file-download"></i> 导出全部技术信息</button>
+                    </div>
+                </div>
+
+                <div class="tabs-container">
+                    ${TABS.map((t, i) => `
+                        <button class="tab-btn ${i === tabIndex ? 'active' : ''}" onclick="renderSystemDetail('${sys.id}', ${i}, 1)">
+                            ${t.label}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            if (isArch) {
+                // 架构图
+                const archName = tab.label;
+                const archKey = tab.key;
+                const hasImage = !!archImageData;
+
+                html += `
+                    <div class="arch-card">
+                        <div class="arch-header">
+                            <div class="arch-title"><i class="fas fa-image"></i> ${archName}</div>
+                            <span class="arch-meta"><i class="far fa-clock"></i> 最后更新：${hasImage ? '刚刚' : '暂无'}</span>
+                        </div>
+                        <div class="upload-area" id="archUploadArea_${archKey}">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-title">点击或拖拽上传图片</div>
+                            <div class="upload-hint">支持 JPG、PNG、SVG 格式</div>
+                            <div class="upload-formats"><i class="fas fa-image"></i> 建议比例 16:9</div>
+                            <i class="fas fa-arrow-right upload-arrow"></i>
+                            <input type="file" accept="image/*" style="display:none;" class="arch-file-input" data-system="${sys.id}" data-tab="${archKey}">
+                        </div>
+                        <div class="image-preview ${hasImage ? 'show' : ''}" id="archPreview_${archKey}">
+                            ${hasImage ? `<img src="${archImageData}" alt="${archName}" />` : ''}
+                            <div class="image-actions">
+                                ${hasImage ? `
+                                    <button class="btn btn-view" onclick="window.open('${archImageData}', '_blank')"><i class="fas fa-expand"></i> 查看大图</button>
+                                    <button class="btn btn-replace arch-replace-btn" data-system="${sys.id}" data-tab="${archKey}"><i class="fas fa-sync-alt"></i> 替换图片</button>
+                                    <button class="btn btn-remove arch-remove-btn" data-system="${sys.id}" data-tab="${archKey}"><i class="fas fa-trash"></i> 删除</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="empty-state" id="archEmpty_${archKey}" style="${hasImage ? 'display:none;' : ''}">
+                            <i class="fas fa-image"></i>
+                            暂无图片，请点击上方区域上传
+                        </div>
+                    </div>
+                `;
+
+                setTimeout(() => bindArchEvents(sys.id, archKey), 50);
+            } else {
+                // 普通表格
+                // 部署信息：只显示精简 10 列
+                let displayFields = fields;
+                let displayIndices = fields.map((_, i) => i);
+                if (isDeploy) {
+                    displayFields = DEPLOY_TABLE_COLS;
+                    displayIndices = DEPLOY_TABLE_COLS.map(name => fields.indexOf(name));
+                }
+
+                html += `
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                        <span style="font-size:14px;color:var(--text-secondary);">共 <strong>${total}</strong> 条记录</span>
+                        <div class="action-bar" style="gap:8px;">
+                            <button class="btn btn-primary" onclick="handleAddRow('${sys.id}', '${tab.key}')" style="padding:6px 16px;font-size:13px;">
+                                <i class="fas fa-plus"></i> 新增
+                            </button>
+                            <button class="btn btn-success" onclick="handleImportTab('${sys.id}', '${tab.key}')" style="padding:6px 16px;font-size:13px;">
+                                <i class="fas fa-file-upload"></i> 导入 ${tab.label}
+                            </button>
+                            <button class="btn btn-export" onclick="handleExportTab('${sys.id}', '${tab.key}')" style="padding:6px 16px;font-size:13px;">
+                                <i class="fas fa-file-download"></i> 导出 ${tab.label}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (isDeploy) {
+                    html += `<div class="table-hint"><i class="fas fa-info-circle"></i> 当前显示 10 个核心字段，完整 32 个字段请点击「查看详情」或「导出」</div>`;
+                }
+
+                html += `
+                    <div class="table-wrapper">
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr>
+                                    ${displayFields.map(f => `<th>${f}</th>`).join('')}
+                                    <th style="min-width:120px;">操作</th>
+                                </tr></thead>
+                                <tbody>
+                `;
+
+                if (pageData.length === 0) {
+                    html += `<tr><td colspan="${displayFields.length+1}" style="text-align:center;padding:40px;color:var(--text-light);">暂无数据</td></tr>`;
+                } else {
+                    pageData.forEach((row, idx) => {
+                        const realIdx = start + idx;
+                        html += `<tr>`;
+                        displayIndices.forEach((ci) => {
+                            const fieldName = fields[ci];
+                            let val = row[ci] !== undefined && row[ci] !== '' ? row[ci] : '/';
+                            if (fieldName === '系统环境' || fieldName === '环境') {
+                                const cls = val === '生产' ? 'env-prod' : val === '测试' ? 'env-test' : val === '开发' ? 'env-dev' : '';
+                                val = `<span class="tag ${cls}">${val}</span>`;
+                            }
+                            html += `<td><span class="text-ellipsis" title="${escapeHtml(val)}">${val}</span></td>`;
+                        });
+                        html += `
+                            <td>
+                                <div class="action-group">
+                                    ${isDeploy ? `<button class="btn-icon view" onclick="handleViewRow('${sys.id}', '${tab.key}', ${realIdx})" title="查看详情"><i class="fas fa-eye"></i></button>` : ''}
+                                    <button class="btn-icon edit" onclick="handleEditRow('${sys.id}', '${tab.key}', ${realIdx})" title="编辑"><i class="fas fa-pen"></i></button>
+                                    <button class="btn-icon delete" onclick="handleDeleteRow('${sys.id}', '${tab.key}', ${realIdx})" title="删除"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        `;
+                        html += `</tr>`;
+                    });
+                }
+
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <span>显示 ${total > 0 ? start+1 : 0} - ${end} 条，共 ${total} 条</span>
+                            <div class="pagination">
+                                <button onclick="renderSystemDetail('${sys.id}', ${tabIndex}, ${currentTablePage-1})" ${currentTablePage<=1?'disabled':''}><i class="fas fa-chevron-left"></i></button>
+                                ${Array.from({length: totalPages}, (_, i) => i+1).map(p =>
+                                    `<button class="${p===currentTablePage?'active':''}" onclick="renderSystemDetail('${sys.id}', ${tabIndex}, ${p})">${p}</button>`
+                                ).join('')}
+                                <button onclick="renderSystemDetail('${sys.id}', ${tabIndex}, ${currentTablePage+1})" ${currentTablePage>=totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            pageContent.innerHTML = html;
+            sidebar.classList.remove('open');
+        }
+
+        // ============================================================
+        // 架构图事件绑定
+        // ============================================================
+        function bindArchEvents(sysId, archKey) {
+            const uploadArea = document.getElementById(`archUploadArea_${archKey}`);
+            if (uploadArea) {
+                const fileInput = uploadArea.querySelector('.arch-file-input');
+                const newInput = fileInput.cloneNode(true);
+                fileInput.parentNode.replaceChild(newInput, fileInput);
+
+                uploadArea.addEventListener('click', function(e) {
+                    if (e.target.closest('.image-actions')) return;
+                    const input = this.querySelector('.arch-file-input');
+                    if (input) input.click();
+                });
+                uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('dragover'); });
+                uploadArea.addEventListener('dragleave', function(e) { e.preventDefault(); this.classList.remove('dragover'); });
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                        const input = this.querySelector('.arch-file-input');
+                        if (input) { input.files = files; handleArchFileUpload(input, sysId, archKey); }
+                    }
+                });
+                const input = uploadArea.querySelector('.arch-file-input');
+                if (input) {
+                    input.addEventListener('change', function() {
+                        if (this.files && this.files.length > 0) handleArchFileUpload(this, sysId, archKey);
+                    });
+                }
+            }
+            document.querySelectorAll('.arch-replace-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tKey = this.dataset.tab;
+                    const area = document.getElementById(`archUploadArea_${tKey}`);
+                    if (area) {
+                        const input = area.querySelector('.arch-file-input');
+                        if (input) input.click();
+                    }
+                });
+            });
+            document.querySelectorAll('.arch-remove-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleArchRemove(this.dataset.system, this.dataset.tab);
+                });
+            });
+        }
+
+        function handleArchFileUpload(input, systemId, tabKey) {
+            const file = input.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('请上传图片文件', 'error'); input.value = ''; return; }
+            if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过 5MB', 'error'); input.value = ''; return; }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const sys = getSystemById(systemId);
+                if (sys && sys.techData[tabKey]) sys.techData[tabKey].imageData = e.target.result;
+                renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+                showToast('架构图上传成功 ✅', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleArchRemove(systemId, tabKey) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            const tabData = sys.techData[tabKey];
+            if (!tabData || !tabData.imageData) { showToast('暂无图片可删除', 'error'); return; }
+
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-trash-alt" style="color:#dc3545;margin-right:8px;"></i>删除确认</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align:center;padding:32px 24px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#dc3545;margin-bottom:16px;"></i>
+                    <p>确定要删除 <span class="highlight">"${TABS.find(t => t.key === tabKey)?.label || '架构图'}"</span> 吗？</p>
+                </div>
+                <div class="modal-footer" style="justify-content:center;">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-danger" onclick="confirmArchRemove('${systemId}', '${tabKey}')"><i class="fas fa-check"></i> 确定删除</button>
+                </div>
+            `);
+        }
+
+        function confirmArchRemove(systemId, tabKey) {
+            const sys = getSystemById(systemId);
+            if (sys && sys.techData[tabKey]) sys.techData[tabKey].imageData = null;
+            closeModal();
+            renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+            showToast('架构图已删除', 'success');
+        }
+
+        // ============================================================
+        // 详情抽屉（用于部署信息查看完整字段）
+        // ============================================================
+        function handleViewRow(systemId, tabKey, rowIndex) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            const tabData = sys.techData[tabKey];
+            if (!tabData) return;
+            const row = tabData.data[rowIndex];
+            if (!row) return;
+            const fields = tabData.fields;
+            const tabLabel = TABS.find(t => t.key === tabKey)?.label || '';
+
+            // 只有部署信息用分组展示
+            if (tabKey === 'deploy') {
+                let bodyHtml = '';
+                DEPLOY_GROUPS.forEach((group, gi) => {
+                    const isOpen = gi === 0;
+                    bodyHtml += `
+                        <div class="detail-section">
+                            <div class="detail-section-header ${isOpen?'open':''}" onclick="toggleDetailSection(this)">
+                                <span><i class="fas ${group.icon}" style="color:var(--primary);margin-right:8px;"></i>${group.name} <span class="count">(${group.fields.length}项)</span></span>
+                                <i class="fas fa-chevron-right arrow"></i>
+                            </div>
+                            <div class="detail-section-body ${isOpen?'open':''}">
+                                ${group.fields.map(f => {
+                                    const idx = fields.indexOf(f);
+                                    const val = idx >= 0 && row[idx] !== undefined && row[idx] !== '' ? row[idx] : '/';
+                                    return `<div class="detail-row"><span class="label">${f}</span><span class="value">${escapeHtml(val)}</span></div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                openDrawer(`
+                    <div class="drawer-header">
+                        <h3><i class="fas fa-info-circle"></i> ${tabLabel} · 详情</h3>
+                        <button class="close" onclick="closeDrawer()">&times;</button>
+                    </div>
+                    <div class="drawer-body">${bodyHtml}</div>
+                `);
+            } else {
+                // 其他 Tab 直接用简单详情
+                let bodyHtml = `<div class="detail-section"><div class="detail-section-body open">`;
+                fields.forEach((f, i) => {
+                    const val = row[i] !== undefined && row[i] !== '' ? row[i] : '/';
+                    bodyHtml += `<div class="detail-row"><span class="label">${f}</span><span class="value">${escapeHtml(val)}</span></div>`;
+                });
+                bodyHtml += `</div></div>`;
+                openDrawer(`
+                    <div class="drawer-header">
+                        <h3><i class="fas fa-info-circle"></i> ${tabLabel} · 详情</h3>
+                        <button class="close" onclick="closeDrawer()">&times;</button>
+                    </div>
+                    <div class="drawer-body">${bodyHtml}</div>
+                `);
+            }
+        }
+
+        function toggleDetailSection(header) {
+            header.classList.toggle('open');
+            const body = header.nextElementSibling;
+            body.classList.toggle('open');
+        }
+
+        // ============================================================
+        // 导航
+        // ============================================================
+        function navigateToSystem(systemId) { renderSystemDetail(systemId, 0, 1); }
+
+        sidebarLinks.forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                renderSystemList();
+                if (window.innerWidth <= 992) sidebar.classList.remove('open');
+            });
+        });
+        hamburgerBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+        // ============================================================
+        // 系统列表 CRUD
+        // ============================================================
+        function resetSystemFilters() {
+            const inp = document.getElementById('sysSearchInput');
+            const domain = document.getElementById('sysDomainFilter');
+            const status = document.getElementById('sysStatusFilter');
+            if (inp) inp.value = '';
+            if (domain) domain.value = '';
+            if (status) status.value = '';
+            renderSystemList();
+        }
+
+        function handleAddSystem() {
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px;"></i>新增系统</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group"><label>系统编码 <span class="required">*</span></label><input type="text" id="newSysCode" placeholder="如：SYS-005"></div>
+                        <div class="form-group"><label>系统名称 <span class="required">*</span></label><input type="text" id="newSysName" placeholder="请输入系统名称"></div>
+                        <div class="form-group">
+                            <label>所属业务域 <span class="required">*</span></label>
+                            <select id="newSysDomain">
+                                <option value="基础服务">基础服务</option>
+                                <option value="交易域">交易域</option>
+                                <option value="运维域">运维域</option>
+                                <option value="数据域">数据域</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>负责人 <span class="required">*</span></label><input type="text" id="newSysOwner" placeholder="请输入负责人姓名"></div>
+                        <div class="form-group full">
+                            <label>状态 <span class="required">*</span></label>
+                            <select id="newSysStatus">
+                                <option value="在建">在建</option>
+                                <option value="已上线">已上线</option>
+                                <option value="已下线">已下线</option>
+                                <option value="维护中">维护中</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitAddSystem()"><i class="fas fa-save"></i> 保存</button>
+                </div>
+            `);
+        }
+
+        function submitAddSystem() {
+            const code = document.getElementById('newSysCode').value.trim();
+            const name = document.getElementById('newSysName').value.trim();
+            const domain = document.getElementById('newSysDomain').value;
+            const owner = document.getElementById('newSysOwner').value.trim();
+            const status = document.getElementById('newSysStatus').value;
+
+            if (!code || !name || !owner) { showToast('请填写完整信息', 'error'); return; }
+            if (systems.some(s => s.code === code)) { showToast('系统编码已存在', 'error'); return; }
+
+            systems.push({
+                id: 'sys-' + Date.now(),
+                code, name, domain, owner, status,
+                createdAt: new Date().toISOString().slice(0, 10),
+                techData: createDefaultTechData()
+            });
+            closeModal();
+            renderSystemList();
+            showToast(`系统 "${name}" 创建成功`, 'success');
+        }
+
+        function handleEditSystem(systemId) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-edit" style="color:var(--primary);margin-right:8px;"></i>编辑系统</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group"><label>系统编码</label><input type="text" value="${sys.code}" disabled style="background:var(--bg-main);"></div>
+                        <div class="form-group"><label>系统名称 <span class="required">*</span></label><input type="text" id="editSysName" value="${escapeHtml(sys.name)}"></div>
+                        <div class="form-group">
+                            <label>所属业务域 <span class="required">*</span></label>
+                            <select id="editSysDomain">
+                                <option value="基础服务" ${sys.domain==='基础服务'?'selected':''}>基础服务</option>
+                                <option value="交易域" ${sys.domain==='交易域'?'selected':''}>交易域</option>
+                                <option value="运维域" ${sys.domain==='运维域'?'selected':''}>运维域</option>
+                                <option value="数据域" ${sys.domain==='数据域'?'selected':''}>数据域</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>负责人 <span class="required">*</span></label><input type="text" id="editSysOwner" value="${escapeHtml(sys.owner)}"></div>
+                        <div class="form-group full">
+                            <label>状态 <span class="required">*</span></label>
+                            <select id="editSysStatus">
+                                <option value="在建" ${sys.status==='在建'?'selected':''}>在建</option>
+                                <option value="已上线" ${sys.status==='已上线'?'selected':''}>已上线</option>
+                                <option value="已下线" ${sys.status==='已下线'?'selected':''}>已下线</option>
+                                <option value="维护中" ${sys.status==='维护中'?'selected':''}>维护中</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitEditSystem('${sys.id}')"><i class="fas fa-save"></i> 更新</button>
+                </div>
+            `);
+        }
+
+        function submitEditSystem(systemId) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            const name = document.getElementById('editSysName').value.trim();
+            const domain = document.getElementById('editSysDomain').value;
+            const owner = document.getElementById('editSysOwner').value.trim();
+            const status = document.getElementById('editSysStatus').value;
+            if (!name || !owner) { showToast('请填写完整信息', 'error'); return; }
+            sys.name = name; sys.domain = domain; sys.owner = owner; sys.status = status;
+            closeModal(); renderSystemList();
+            showToast(`系统 "${name}" 更新成功`, 'success');
+        }
+
+        function handleDeleteSystem(systemId) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-trash-alt" style="color:#dc3545;margin-right:8px;"></i>删除确认</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align:center;padding:32px 24px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#dc3545;margin-bottom:16px;"></i>
+                    <p>确定要删除系统 <span class="highlight">"${sys.name} (${sys.code})"</span> 吗？</p>
+                    <p style="font-size:13px;color:var(--text-light);margin-top:4px;">该操作将同时删除该系统全部技术信息，不可恢复</p>
+                </div>
+                <div class="modal-footer" style="justify-content:center;">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-danger" onclick="confirmDeleteSystem('${sys.id}')"><i class="fas fa-check"></i> 确定删除</button>
+                </div>
+            `);
+        }
+
+        function confirmDeleteSystem(systemId) {
+            const idx = systems.findIndex(s => s.id === systemId);
+            if (idx > -1) systems.splice(idx, 1);
+            closeModal(); renderSystemList();
+            showToast('系统已删除', 'success');
+        }
+
+        // ============================================================
+        // 系统列表 导入/导出
+        // ============================================================
+        function handleImportSystems() {
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-upload" style="color:var(--primary);margin-right:8px;"></i>导入系统</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-zone" id="sysImportZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>点击或拖拽上传 Excel 文件</strong></p>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px;">支持 .xlsx, .xls 格式</div>
+                        <div style="font-size:12px;color:var(--text-light);">字段：系统编码、系统名称、所属业务域、负责人、状态</div>
+                        <input type="file" accept=".xlsx,.xls" style="display:none;" id="sysImportInput" onchange="handleSysImportFile(event)">
+                        <div class="file-name" id="sysImportFileName"></div>
+                    </div>
+                    <div id="sysImportPreview" style="margin-top:16px;display:none;">
+                        <p style="font-weight:500;color:var(--primary);"><i class="fas fa-check-circle"></i> 文件解析成功，共 3 条数据待导入</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-success" id="sysImportConfirm" onclick="confirmSysImport()" disabled><i class="fas fa-upload"></i> 确认导入</button>
+                </div>
+            `);
+            const zone = document.getElementById('sysImportZone');
+            const input = document.getElementById('sysImportInput');
+            zone.addEventListener('click', () => input.click());
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
+            zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault(); zone.style.borderColor = '';
+                if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; handleSysImportFile({ target: input }); }
+            });
+        }
+
+        function handleSysImportFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('sysImportFileName').textContent = file.name;
+            document.getElementById('sysImportPreview').style.display = 'block';
+            document.getElementById('sysImportConfirm').disabled = false;
+            showToast('文件解析成功', 'success');
+        }
+
+        function confirmSysImport() {
+            const samples = [
+                { code: 'SYS-005', name: '消息中心', domain: '基础服务', owner: '刘七', status: '在建' },
+                { code: 'SYS-006', name: '报表平台', domain: '数据域', owner: '陈八', status: '已上线' },
+                { code: 'SYS-007', name: '监控平台', domain: '运维域', owner: '杨九', status: '维护中' }
+            ];
+            samples.forEach(s => {
+                systems.push({
+                    id: 'sys-' + Date.now() + Math.random().toString(36).slice(2, 6),
+                    code: s.code, name: s.name, domain: s.domain, owner: s.owner, status: s.status,
+                    createdAt: new Date().toISOString().slice(0, 10),
+                    techData: createDefaultTechData()
+                });
+            });
+            closeModal(); renderSystemList();
+            showToast('成功导入 3 个系统', 'success');
+        }
+
+        function handleExportSystems() {
+            let csv = '系统编码,系统名称,所属业务域,负责人,状态,创建时间\n';
+            systems.forEach(s => { csv += `${s.code},${s.name},${s.domain},${s.owner},${s.status},${s.createdAt}\n`; });
+            downloadCsv(csv, '系统列表.csv');
+            showToast('系统列表导出成功', 'success');
+        }
+
+        function downloadCsv(content, filename) {
+            const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // ============================================================
+        // 系统详情 — 行操作
+        // ============================================================
+        function getTabData(systemId, tabKey) {
+            const sys = getSystemById(systemId);
+            if (!sys) return null;
+            return sys.techData[tabKey] || null;
+        }
+
+        // 生成字段表单（部署信息用分组排版）
+        function buildFormHtml(fields, row, tabKey) {
+            if (tabKey === 'deploy') {
+                let html = '';
+                DEPLOY_GROUPS.forEach(group => {
+                    html += `<div class="form-section-title"><i class="fas ${group.icon}"></i> ${group.name}</div>`;
+                    html += `<div class="form-grid">`;
+                    group.fields.forEach(f => {
+                        const idx = fields.indexOf(f);
+                        const val = row && row[idx] !== undefined ? row[idx] : '';
+                        html += `
+                            <div class="form-group">
+                                <label>${f}</label>
+                                <input type="text" id="rowField_${idx}" value="${escapeHtml(val)}" placeholder="请输入${f}">
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                });
+                return html;
+            } else {
+                let html = `<div class="form-grid">`;
+                fields.forEach((f, i) => {
+                    const val = row && row[i] !== undefined ? row[i] : '';
+                    html += `
+                        <div class="form-group ${i===0?'full':''}">
+                            <label>${f}</label>
+                            <input type="text" id="rowField_${i}" value="${escapeHtml(val)}" placeholder="请输入${f}">
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                return html;
+            }
+        }
+
+        function handleAddRow(systemId, tabKey) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData || tabData.isArch) return;
+            const fields = tabData.fields;
+            const formHtml = buildFormHtml(fields, null, tabKey);
+            const tabLabel = TABS.find(t => t.key === tabKey)?.label || '';
+            const large = tabKey === 'deploy';
+
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-plus-circle" style="color:var(--primary);margin-right:8px;"></i>新增 ${tabLabel}</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">${formHtml}</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitAddRow('${systemId}', '${tabKey}')"><i class="fas fa-save"></i> 保存</button>
+                </div>
+            `, large);
+        }
+
+        function submitAddRow(systemId, tabKey) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData) return;
+            const fields = tabData.fields;
+            const newRow = fields.map((_, i) => {
+                const el = document.getElementById(`rowField_${i}`);
+                return el ? el.value.trim() || '/' : '/';
+            });
+            tabData.data.push(newRow);
+            closeModal();
+            renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+            showToast('新增成功', 'success');
+        }
+
+        function handleEditRow(systemId, tabKey, rowIndex) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData || tabData.isArch) return;
+            const fields = tabData.fields;
+            const row = tabData.data[rowIndex];
+            if (!row) return;
+            const formHtml = buildFormHtml(fields, row, tabKey);
+            const tabLabel = TABS.find(t => t.key === tabKey)?.label || '';
+            const large = tabKey === 'deploy';
+
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-edit" style="color:var(--primary);margin-right:8px;"></i>编辑 ${tabLabel}</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">${formHtml}</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitEditRow('${systemId}', '${tabKey}', ${rowIndex})"><i class="fas fa-save"></i> 更新</button>
+                </div>
+            `, large);
+        }
+
+        function submitEditRow(systemId, tabKey, rowIndex) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData) return;
+            const fields = tabData.fields;
+            const newRow = fields.map((_, i) => {
+                const el = document.getElementById(`rowField_${i}`);
+                return el ? el.value.trim() || '/' : '/';
+            });
+            tabData.data[rowIndex] = newRow;
+            closeModal();
+            renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+            showToast('更新成功', 'success');
+        }
+
+        function handleDeleteRow(systemId, tabKey, rowIndex) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData || tabData.isArch) return;
+            const row = tabData.data[rowIndex];
+            const name = row && row[1] ? row[1] : (row && row[0] ? row[0] : '这条记录');
+
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-trash-alt" style="color:#dc3545;margin-right:8px;"></i>删除确认</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align:center;padding:32px 24px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#dc3545;margin-bottom:16px;"></i>
+                    <p>确定要删除 <span class="highlight">"${name}"</span> 吗？</p>
+                </div>
+                <div class="modal-footer" style="justify-content:center;">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-danger" onclick="confirmDeleteRow('${systemId}', '${tabKey}', ${rowIndex})"><i class="fas fa-check"></i> 确定删除</button>
+                </div>
+            `);
+        }
+
+        function confirmDeleteRow(systemId, tabKey, rowIndex) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData) return;
+            tabData.data.splice(rowIndex, 1);
+            closeModal();
+            renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+            showToast('删除成功', 'success');
+        }
+
+        // ============================================================
+        // 系统详情 — Tab 导入/导出（全字段）
+        // ============================================================
+        function handleImportTab(systemId, tabKey) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            const tabData = sys.techData[tabKey];
+            if (!tabData || tabData.isArch) return;
+            const tabLabel = TABS.find(t => t.key === tabKey)?.label || '';
+            const fieldCount = tabData.fields.length;
+
+            openModal(`
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-upload" style="color:var(--primary);margin-right:8px;"></i>导入 ${tabLabel}</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-zone" id="tabImportZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>点击或拖拽上传 Excel 文件</strong></p>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px;">支持 .xlsx, .xls 格式</div>
+                        <div style="font-size:12px;color:var(--text-light);">模板包含全部 <strong>${fieldCount}</strong> 个字段</div>
+                        <input type="file" accept=".xlsx,.xls" style="display:none;" id="tabImportInput" onchange="handleTabImportFile(event)">
+                        <div class="file-name" id="tabImportFileName"></div>
+                    </div>
+                    <div id="tabImportPreview" style="margin-top:16px;display:none;">
+                        <p style="font-weight:500;color:var(--primary);"><i class="fas fa-check-circle"></i> 文件解析成功，数据校验通过</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-success" id="tabImportConfirm" onclick="confirmTabImport('${systemId}', '${tabKey}')" disabled><i class="fas fa-upload"></i> 确认导入</button>
+                </div>
+            `);
+            const zone = document.getElementById('tabImportZone');
+            const input = document.getElementById('tabImportInput');
+            zone.addEventListener('click', () => input.click());
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
+            zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault(); zone.style.borderColor = '';
+                if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; handleTabImportFile({ target: input }); }
+            });
+        }
+
+        function handleTabImportFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('tabImportFileName').textContent = file.name;
+            document.getElementById('tabImportPreview').style.display = 'block';
+            document.getElementById('tabImportConfirm').disabled = false;
+            showToast('文件解析成功', 'success');
+        }
+
+        function confirmTabImport(systemId, tabKey) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData) return;
+            const fields = tabData.fields;
+            const sample = fields.map((_, i) => `导入数据${i+1}`);
+            tabData.data.push(sample);
+            tabData.data.push(sample.map((_, i) => `导入数据${i+1}-v2`));
+            closeModal();
+            renderSystemDetail(systemId, currentTabIndex, currentTablePage);
+            showToast('导入成功', 'success');
+        }
+
+        function handleExportTab(systemId, tabKey) {
+            const tabData = getTabData(systemId, tabKey);
+            if (!tabData || tabData.isArch) { showToast('该类型不支持导出', 'error'); return; }
+            const tabLabel = TABS.find(t => t.key === tabKey)?.label || '';
+            // 导出全字段
+            let csv = tabData.fields.map(f => `"${f}"`).join(',') + '\n';
+            tabData.data.forEach(row => {
+                csv += row.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            downloadCsv(csv, `${tabLabel}.csv`);
+            showToast(`${tabLabel} 导出成功（含全部 ${tabData.fields.length} 个字段）`, 'success');
+        }
+
+        function handleExportFullSystem(systemId) {
+            const sys = getSystemById(systemId);
+            if (!sys) return;
+            showToast(`正在导出 ${sys.name} 全部技术信息（15 个维度）...`, 'success');
+            setTimeout(() => { showToast(`${sys.name} 全部技术信息导出成功`, 'success'); }, 800);
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        renderSystemList();
+    </script>
+
+</body>
+</html>

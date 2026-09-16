@@ -14,17 +14,20 @@
 
 | 层级 | 技术 | 版本 |
 |------|------|------|
+| **基座** | RuoYi-Vue-Plus（RuoYi 的 dromara 社区增强版） | Spring Boot 3.5，单体形态 |
 | **后端** | Java + Spring Boot | Java 17 / Spring Boot 3.x |
 | **构建工具** | Maven | 3.9+ |
 | **ORM** | MyBatis-Plus | 3.5+ |
+| **权限认证** | Sa-Token + JWT | 官方内置 |
+| **缓存** | Redis | >= 6 |
 | **数据库** | KingbaseES | V8R6（人大金仓） |
 | **数据库驱动（业务）** | Kingbase 官方驱动 | `com.kingbase8.Driver` |
 | **数据库驱动（Flyway）** | PostgreSQL 驱动 | `org.postgresql.Driver` |
-| **加密** | 国密算法（SM2/SM3/SM4） | kbcrypto 插件 |
+| **加密** | 国密算法（SM2/SM3/SM4） | Hutool + BouncyCastle |
 | **国密库** | Hutool + BouncyCastle | 5.8+ / 1.78+ |
-| **前端** | Vue 3 + TypeScript + Composition API | Vue 3.4+ |
+| **前端** | Vue 3 + TypeScript + Composition API（plus-ui） | Vue 3.4+ |
 | **前端构建** | Vite | 5.x |
-| **UI 框架** | Element Plus / Ant Design Vue | 最新 LTS |
+| **UI 框架** | Element Plus | 最新 LTS |
 | **状态管理** | Pinia | 2.x |
 
 ### 项目结构
@@ -76,7 +79,14 @@ my-openspec-project/
 | 状态管理 | Pinia |
 | **加密策略** | **国密（SM2/SM3/SM4）** |
 | **密码存储** | **SM3 哈希（加固定常量迭代）** |
-| **敏感字段** | **SM4 加密**（手机号、身份证、资产密钥） |
+| **敏感字段** | **SM4 加密**（手机号、身份证、资产密钥、数据库用户名） |
+| **金仓适配** | 分页方言 `POSTGRE_SQL`；表/字段全小写下划线；`DATETIME`→`TIMESTAMP`；补 `find_in_set` 函数 |
+
+### RuoYi-Vue-Plus 二次开发约定
+
+1. **形态**：单体应用，**彻底移除工作流（Flowable）模块**，不用多租户
+2. **代码生成**：所有 CRUD 用内置代码生成器产出，人工修改须符合本索引与 `docs/rules/` 约定
+3. **模块裁剪**：保留系统管理（用户/角色/菜单/部门/字典/日志）、文件管理；其余按需删除
 
 ---
 

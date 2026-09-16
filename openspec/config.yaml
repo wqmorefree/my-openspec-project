@@ -4,11 +4,24 @@ schema: spec-driven
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.
 context: |
-  系统技术资产登记管理（信创合规）。
-  后端：Java 17 + Spring Boot 3 + MyBatis-Plus + KingbaseES（人大金仓 V8R6，端口 54321），
-  数据敏感字段用数据库层 kbcrypto SM4 加密，密码 SM3 三次加盐。
-  前端：Vue 3 + TypeScript + Pinia + Vite。
-  规范：Conventional Commits；API 前缀 /api/v1；主键 UUID。
+  系统技术资产登记管理
+
+  技术基座：基于 RuoYi-Vue-Plus（RuoYi 的 dromara 社区增强版，Spring Boot 3.5 + JDK 17）二次开发，
+  采用单体（非微服务）形态，彻底移除工作流（Flowable）模块。
+  权限认证：Sa-Token + JWT；缓存依赖 Redis（>=6）。
+  前端：Vue 3 + TypeScript + Element Plus + Pinia + Vite（plus-ui 分支）。
+  ORM：MyBatis-Plus，代码生成器统一产出 CRUD。
+
+  数据库：KingbaseES（人大金仓 V8R6，端口 54321）。
+  Flyway（PostgreSQL 驱动）负责迁移；业务数据源用 com.kingbase8.Driver。
+  金仓适配约定：MyBatis-Plus 分页方言=POSTGRE_SQL；表/字段全小写（下划线命名）；
+  DATETIME→TIMESTAMP；库内补 find_in_set 函数；避免 string 与 bigint 直接比较。
+
+  加密（国密）：SM2 登录传输加密 + JWT 签名；SM3 密码哈希（三次迭代 + 固定盐常量）；
+  敏感字段（手机号、身份证、资产密钥、数据库用户名）SM4 加密存储。
+  国密库：Hutool + BouncyCastle。
+
+  规范：Conventional Commits；API 前缀 /api/v1；主键 UUID（VARCHAR(64)）。
   领域规则见 docs/rules/，功能规范见 openspec/specs/。
 
 # Per-artifact rules (optional)
