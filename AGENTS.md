@@ -39,6 +39,7 @@ my-openspec-project/
 ├── backend/              # 后端代码（Java + Spring Boot）
 ├── frontend/             # 前端代码（Vue 3 + Vite）
 ├── docs/rules/           # 领域规则文件（本索引引用）
+├── docs/adr/             # 架构决策记录（ADR），change 的 design.md 引用
 ├── openspec/             # OpenSpec 规范库
 │   ├── specs/            # 功能规范（业务场景）
 │   └── changes/          # 变更提案
@@ -61,6 +62,8 @@ my-openspec-project/
 | `docs/rules/database.md` | Mapper、SQL、实体类 | KingbaseES 表设计、通用字段、Flyway、国密加密 |
 | `docs/rules/security.md` | 所有涉及安全边界的代码 | 国密算法（SM2/SM3/SM4）、SQL 注入、XSS、越权防护 |
 | `docs/rules/testing.md` | 所有测试文件 | 测试命名、覆盖率、国密测试、CI 集成 |
+| `docs/rules/adr.md` | 生成 ADR 或 design.md「技术选型」章节 | ADR 模板、编号规则、写作要求、与 design.md 联动 |
+| `docs/rules/design.md` | 创建/修改 change 的 `design.md` | design.md 固定六章结构、写作要求、禁止事项 |
 
 ---
 
@@ -149,6 +152,7 @@ feat(asset): 添加资产登记功能
 |----------|------|------|
 | `AGENTS.md` | **总索引**：技术栈、项目结构、快速参考 | 所有开发活动 |
 | `docs/rules/` | **领域规则**：编码、API、数据库、安全、测试 | 按领域按需加载 |
+| `docs/adr/` | **架构决策记录（ADR）**：关键技术决策与取舍 | change 的 design.md 引用 |
 | `openspec/specs/` | **功能规范**：具体功能的验收场景 | 按功能模块维护 |
 | `openspec/changes/` | **变更提案**：进行中的变更 | 按变更独立维护 |
 
@@ -157,6 +161,8 @@ feat(asset): 添加资产登记功能
 1. **`AGENTS.md` + `docs/rules/` 是基础约束**：AI 在生成代码和规范时，必须遵循所有约定
 2. **`openspec/specs/` 是功能说明书**：描述"系统应该做什么"，而非"怎么做"
 3. **冲突时的优先级**：`openspec/specs/` 中的功能需求优先于通用约定
+4. **design.md 技术选型章节必须联动 ADR**：生成 change 的 `design.md` 时，每个关键决策须同步在 `docs/adr/` 创建独立 ADR 文件并编号 `ADR-NNN`，design.md 按 `ADR-001 -> ruoyi-vue-plus-fast` 格式标注编号 + 语义短名。已有 ADR 直接引用，新增决策才新建 ADR。**撰写规则见 `docs/rules/adr.md`**。
+5. **design.md 固定六章结构**：所有 change 的 `design.md` 必须按固定六章结构生成，不得增删章节（系统架构 / 模块职责 / 数据模型 / 接口契约 / 技术选型(ADR) / 非功能性约束）。**完整模板与写作要求见 `docs/rules/design.md`**。
 
 ### 6.3 OpenSpec 标准工作流
 
