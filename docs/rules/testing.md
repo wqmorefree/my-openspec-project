@@ -735,10 +735,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup JDK 17
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
       

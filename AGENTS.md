@@ -14,8 +14,8 @@
 
 | 层级 | 技术 | 版本 |
 |------|------|------|
-| **基座** | RuoYi-Vue-Plus（RuoYi 的 dromara 社区增强版） | Spring Boot 3.5，单体形态 |
-| **后端** | Java + Spring Boot | Java 17 / Spring Boot 3.x |
+| **基座** | RuoYi-Vue-Plus（RuoYi 的 dromara 社区增强版） | Spring Boot 4.x，单体形态 |
+| **后端** | Java + Spring Boot | Java 21 / Spring Boot 4.x |
 | **构建工具** | Maven | 3.9+ |
 | **ORM** | MyBatis-Plus | 3.5+ |
 | **权限认证** | Sa-Token + JWT | 官方内置 |
@@ -162,7 +162,7 @@ feat(asset): 添加资产登记功能
 1. **`AGENTS.md` + `docs/rules/` 是基础约束**：AI 在生成代码和规范时，必须遵循所有约定
 2. **`openspec/specs/` 是功能说明书**：描述"系统应该做什么"，而非"怎么做"
 3. **冲突时的优先级**：`openspec/specs/` 中的功能需求优先于通用约定
-4. **design.md 技术选型章节必须联动 ADR**：生成 change 的 `design.md` 时，每个关键决策须同步在 `docs/adr/` 创建独立 ADR 文件并编号 `ADR-NNN`，design.md 按 `ADR-001 -> ruoyi-vue-plus-fast` 格式标注编号 + 语义短名。已有 ADR 直接引用，新增决策才新建 ADR。**撰写规则见 `docs/rules/adr.md`**。
+4. **design.md 技术选型章节必须联动 ADR**：生成 change 的 `design.md` 时，每个关键决策须同步在 `docs/adr/` 创建独立 ADR 文件并编号 `ADR-NNN`，design.md 按 `ADR-001 -> ruoyi-vue-plus-6x` 格式标注编号 + 语义短名。已有 ADR 直接引用，新增决策才新建 ADR。**撰写规则见 `docs/rules/adr.md`**。
 5. **design.md 固定六章结构**：所有 change 的 `design.md` 必须按固定六章结构生成，不得增删章节（系统架构 / 模块职责 / 数据模型 / 接口契约 / 技术选型(ADR) / 非功能性约束）。**完整模板与写作要求见 `docs/rules/design.md`**。
 
 ### 6.3 OpenSpec 标准工作流
