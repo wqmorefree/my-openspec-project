@@ -64,6 +64,7 @@ my-openspec-project/
 | `docs/rules/testing.md` | 所有测试文件 | 测试命名、覆盖率、国密测试、CI 集成 |
 | `docs/rules/adr.md` | 生成 ADR 或 design.md「技术选型」章节 | ADR 模板、编号规则、写作要求、与 design.md 联动 |
 | `docs/rules/design.md` | 创建/修改 change 的 `design.md` | design.md 固定六章结构、写作要求、禁止事项 |
+| `docs/rules/task.md` | 创建/修改 change 的 `tasks.md` | tasks.md 三层结构、任务粒度标准、任务模板格式、验收标准三特征 |
 
 ---
 
