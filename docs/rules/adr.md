@@ -7,7 +7,7 @@
 
 - 每篇 ADR 一个文件：`docs/adr/ADR-{编号}-{英文短名}.md`。
 - 编号 `ADR-NNN` **全局递增，不随 change 重置**；已有 ADR 直接引用，新增决策才新建。
-- 语义短名用小写连字符（如 `ruoyi-vue-plus-fast`）。
+- 语义短名用小写连字符（如 `ruoyi-vue-plus-6x`）。
 
 ## 二、模板
 

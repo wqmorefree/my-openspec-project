@@ -7,7 +7,7 @@
 
 | 编号 | 决策标题 | 状态 | 关联 Change |
 |---|---|---|---|
-| ADR-001 | 采用 RuoYi-Vue-Plus fast 单体分支作为基座 | Accepted | add-asset-registration-core |
+| ADR-001 | 采用 RuoYi-Vue-Plus 6.X 单体分支作为基座 | Accepted | add-asset-registration-core |
 | ADR-002 | 数据库接入 KingbaseES + Flyway(pg) + POSTGRE_SQL 方言 | Accepted | add-asset-registration-core |
 | ADR-003 | 认证与权限采用 Sa-Token + JWT，权限点控删除 | Accepted | add-asset-registration-core |
 | ADR-004 | 国密分层：SM2 传输 / SM3 哈希 / SM4 敏感字段(kbcrypto) | Accepted | add-asset-registration-core |

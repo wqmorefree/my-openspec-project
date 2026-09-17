@@ -152,7 +152,7 @@ CREATE UNIQUE INDEX uk_sys_asset_code ON sys_asset (code) WHERE is_deleted = 0;
 
 > 完整决策内容（状态 / 背景 / 选项 / 决策 / 理由）见 `docs/adr/` 对应文件，design.md 只做引用。ADR 编号全局递增。
 
-- ADR-001 -> ruoyi-vue-plus-fast
+- ADR-001 -> ruoyi-vue-plus-6x
 - ADR-002 -> kingbase-flyway-dialect
 - ADR-003 -> sa-token-auth
 - ADR-004 -> gm-encryption-layers
