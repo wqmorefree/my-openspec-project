@@ -1,0 +1,28 @@
+# 换行符统一规范：仓库内以 LF 存储，Windows 检出自动转 CRLF
+* text=auto
+
+*.md text eol=crlf
+*.java text eol=crlf
+*.xml text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+*.json text eol=crlf
+*.sql text eol=crlf
+*.properties text eol=crlf
+*.vue text eol=crlf
+*.ts text eol=crlf
+*.js text eol=crlf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.jar binary
+*.zip binary
+*.war binary
+*.class binary
