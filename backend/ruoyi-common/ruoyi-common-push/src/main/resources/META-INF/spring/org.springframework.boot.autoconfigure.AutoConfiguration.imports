@@ -1,0 +1,3 @@
+com.openspec.project.common.push.config.MessageAutoConfiguration
+com.openspec.project.common.push.config.MessageSseConfiguration
+com.openspec.project.common.push.config.MessageWebSocketConfiguration

@@ -1,0 +1,36 @@
+-- V7：系统技术资产菜单与权限点
+-- Task 24/29/30/31 前端落地：新增「系统技术资产」目录 + 资产列表菜单 + 操作权限点，
+-- 授权超级管理员（superadmin 无 role_menu 行 = 全菜单）与普通用户（test1/test2）。
+-- 普通用户可新增/查看/编辑/导入/导出资产，但无删除权限点（删除仅管理员）。
+
+-- 1. 系统技术资产目录（顶层目录，路由前缀 /asset）
+INSERT INTO sys_menu VALUES (1761400000000000200, '系统技术资产', 0, 2, 'asset', null, '', 'N', 'Y', 'M', '0', '0', '', 'list', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '系统技术资产目录');
+
+-- 2. 资产列表菜单（component 指向 views/system/asset/index.vue）
+INSERT INTO sys_menu VALUES (1761400000000000201, '资产列表', 1761400000000000200, 1, 'list', 'system/asset/index', '', 'N', 'Y', 'C', '0', '0', 'system:asset:list', 'list', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '系统技术资产列表菜单');
+
+-- 3. 操作权限点
+INSERT INTO sys_menu VALUES (1761400000000000202, '资产查询', 1761400000000000201, 1, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:query', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+INSERT INTO sys_menu VALUES (1761400000000000203, '资产新增', 1761400000000000201, 2, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:add', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+INSERT INTO sys_menu VALUES (1761400000000000204, '资产修改', 1761400000000000201, 3, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:edit', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+-- 删除权限点仅管理员所有（test1/test2 不授予）
+INSERT INTO sys_menu VALUES (1761400000000000205, '资产删除', 1761400000000000201, 4, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:remove', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+INSERT INTO sys_menu VALUES (1761400000000000206, '资产导出', 1761400000000000201, 5, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:export', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+INSERT INTO sys_menu VALUES (1761400000000000207, '资产导入', 1761400000000000201, 6, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:asset:import', '#', '', '', 1761000000000000103, 1761100000000000001, CURRENT_TIMESTAMP, null, null, '');
+
+-- 4. 授权普通用户角色（test1=1761300000000000003 / test2=1761300000000000004）
+--    目录 + 列表 + 查询/新增/修改/导出/导入；故意不授删除
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000200);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000200);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000201);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000201);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000202);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000202);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000203);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000203);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000204);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000204);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000206);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000206);
+INSERT INTO sys_role_menu VALUES (1761300000000000003, 1761400000000000207);
+INSERT INTO sys_role_menu VALUES (1761300000000000004, 1761400000000000207);

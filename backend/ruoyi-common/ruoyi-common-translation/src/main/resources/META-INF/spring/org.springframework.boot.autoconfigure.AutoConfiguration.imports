@@ -1,0 +1,6 @@
+com.openspec.project.common.translation.config.TranslationConfig
+com.openspec.project.common.translation.core.impl.DeptNameTranslationImpl
+com.openspec.project.common.translation.core.impl.DictTypeTranslationImpl
+com.openspec.project.common.translation.core.impl.OssUrlTranslationImpl
+com.openspec.project.common.translation.core.impl.UserNameTranslationImpl
+com.openspec.project.common.translation.core.impl.NicknameTranslationImpl

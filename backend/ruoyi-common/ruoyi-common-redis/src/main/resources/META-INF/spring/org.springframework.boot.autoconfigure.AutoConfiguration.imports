@@ -1,0 +1,5 @@
+com.openspec.project.common.redis.config.RedisConfig
+com.openspec.project.common.redis.config.CacheConfig
+com.openspec.project.common.redis.config.IdempotentConfig
+com.openspec.project.common.redis.config.RateLimiterConfig
+com.openspec.project.common.redis.config.Lock4jConfig

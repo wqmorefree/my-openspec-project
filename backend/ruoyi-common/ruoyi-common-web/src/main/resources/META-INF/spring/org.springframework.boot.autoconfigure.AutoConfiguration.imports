@@ -1,0 +1,4 @@
+com.openspec.project.common.web.config.CaptchaConfig
+com.openspec.project.common.web.config.FilterConfig
+com.openspec.project.common.web.config.I18nConfig
+com.openspec.project.common.web.config.ResourcesConfig
