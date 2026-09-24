@@ -14,3 +14,4 @@
 | ADR-005 | 数据模型：sys_asset 主表 + 子表独立 change | Accepted | add-asset-registration-core |
 | ADR-006 | 详情页采用 Tab 宿主 + 子表组件注册表 | Accepted | add-asset-registration-core |
 | ADR-007 | 导入导出：EasyExcel 导入 + CSV 流式导出 | Accepted | add-asset-registration-core |
+| ADR-008 | 部署信息采用单表平铺节点模型 | Accepted | add-deploy-info-tab |

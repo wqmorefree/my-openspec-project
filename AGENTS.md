@@ -40,6 +40,7 @@ my-openspec-project/
 ├── frontend/             # 前端代码（Vue 3 + Vite）
 ├── docs/rules/           # 领域规则文件（本索引引用）
 ├── docs/adr/             # 架构决策记录（ADR），change 的 design.md 引用
+├── docs/prototype/       # 需求原型 HTML（需求澄清权威来源）
 ├── openspec/             # OpenSpec 规范库
 │   ├── specs/            # 功能规范（业务场景）
 │   └── changes/          # 变更提案
@@ -154,6 +155,7 @@ feat(asset): 添加资产登记功能
 | `AGENTS.md` | **总索引**：技术栈、项目结构、快速参考 | 所有开发活动 |
 | `docs/rules/` | **领域规则**：编码、API、数据库、安全、测试 | 按领域按需加载 |
 | `docs/adr/` | **架构决策记录（ADR）**：关键技术决策与取舍 | change 的 design.md 引用 |
+| `docs/prototype/` | **需求原型**：字段集合、Tab 划分、交互行为、导入导出等需求语义的权威来源 | 需求澄清时优先查阅 |
 | `openspec/specs/` | **功能规范**：具体功能的验收场景 | 按功能模块维护 |
 | `openspec/changes/` | **变更提案**：进行中的变更 | 按变更独立维护 |
 
@@ -162,8 +164,9 @@ feat(asset): 添加资产登记功能
 1. **`AGENTS.md` + `docs/rules/` 是基础约束**：AI 在生成代码和规范时，必须遵循所有约定
 2. **`openspec/specs/` 是功能说明书**：描述"系统应该做什么"，而非"怎么做"
 3. **冲突时的优先级**：`openspec/specs/` 中的功能需求优先于通用约定
-4. **design.md 技术选型章节必须联动 ADR**：生成 change 的 `design.md` 时，每个关键决策须同步在 `docs/adr/` 创建独立 ADR 文件并编号 `ADR-NNN`，design.md 按 `ADR-001 -> ruoyi-vue-plus-6x` 格式标注编号 + 语义短名。已有 ADR 直接引用，新增决策才新建 ADR。**撰写规则见 `docs/rules/adr.md`**。
-5. **design.md 固定六章结构**：所有 change 的 `design.md` 必须按固定六章结构生成，不得增删章节（系统架构 / 模块职责 / 数据模型 / 接口契约 / 技术选型(ADR) / 非功能性约束）。**完整模板与写作要求见 `docs/rules/design.md`**。
+4. **需求澄清以原型为准**：字段集合、Tab 划分、交互行为、导入导出按钮等需求语义，一律以 `docs/prototype/` 下的原型 HTML 为准（当前为 `系统技术资产登记表原型-v2.html`）；与既有文档或 AI 假设冲突时以原型为准，不再就此反问用户。技术实现层面的取舍仍遵循本索引与 `docs/rules/`
+5. **design.md 技术选型章节必须联动 ADR**：生成 change 的 `design.md` 时，每个关键决策须同步在 `docs/adr/` 创建独立 ADR 文件并编号 `ADR-NNN`，design.md 按 `ADR-001 -> ruoyi-vue-plus-6x` 格式标注编号 + 语义短名。已有 ADR 直接引用，新增决策才新建 ADR。**撰写规则见 `docs/rules/adr.md`**。
+6. **design.md 固定六章结构**：所有 change 的 `design.md` 必须按固定六章结构生成，不得增删章节（系统架构 / 模块职责 / 数据模型 / 接口契约 / 技术选型(ADR) / 非功能性约束）。**完整模板与写作要求见 `docs/rules/design.md`**。
 
 ### 6.3 OpenSpec 标准工作流
 

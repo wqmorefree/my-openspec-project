@@ -19,9 +19,11 @@ import com.openspec.project.system.domain.SysAsset;
 import com.openspec.project.system.domain.bo.SysAssetBo;
 import com.openspec.project.system.domain.vo.SysAssetVo;
 import com.openspec.project.system.mapper.SysAssetMapper;
+import com.openspec.project.system.service.ISysAssetDeployService;
 import com.openspec.project.system.service.ISysAssetService;
 import com.openspec.project.system.service.ISysDictTypeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,6 +53,8 @@ public class SysAssetServiceImpl implements ISysAssetService {
     private final SysAssetMapper assetMapper;
 
     private final ISysDictTypeService dictTypeService;
+
+    private final ISysAssetDeployService deployService;
 
     /**
      * 分页查询系统技术资产列表
@@ -252,17 +256,22 @@ public class SysAssetServiceImpl implements ISysAssetService {
     }
 
     /**
-     * 批量删除系统技术资产（逻辑删除）
+     * 批量删除系统技术资产（逻辑删除）。
+     *
+     * <p>同事务内连带逻辑删除其全部部署节点，避免产生孤儿节点；任一失败整体回滚。</p>
      *
      * @param ids 需要删除的主键ID集合
      * @return 影响行数
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deleteAssetByIds(Collection<String> ids) {
         if (CollUtil.isEmpty(ids)) {
             return 0;
         }
-        return assetMapper.deleteByIds(ids);
+        int rows = assetMapper.deleteByIds(ids);
+        deployService.deleteByAssetIds(ids);
+        return rows;
     }
 
 }

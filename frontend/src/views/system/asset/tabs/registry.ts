@@ -18,7 +18,7 @@ export interface AssetTabDefinition {
 
 export const TABS: AssetTabDefinition[] = [
   { key: 'basic-info', label: '基础信息', component: defineAsyncComponent(() => import('./basic-info.vue')) },
-  { key: 'deploy-info', label: '部署信息' },
+  { key: 'deploy-info', label: '部署信息', component: defineAsyncComponent(() => import('./deploy-info.vue')) },
   { key: 'interface-dep', label: '接口依赖' },
   { key: 'database', label: '数据库' },
   { key: 'middleware', label: '中间件' },

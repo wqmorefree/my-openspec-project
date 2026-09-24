@@ -7,7 +7,7 @@
           <h3>
             {{ asset ? `${asset.code} · ${asset.name}` : '系统详情' }}
           </h3>
-          <p>当前系统上下文保持：{{ asset?.code || '-' }} / {{ asset?.name || '-' }}</p>
+          <!--<p>当前系统：{{ asset?.code || '-' }} / {{ asset?.name || '-' }}</p>-->
         </div>
         <div class="header-actions">
           <el-button icon="Back" @click="handleBack">返回列表</el-button>
